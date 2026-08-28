@@ -256,7 +256,7 @@ Figma: https://www.figma.com/design/kUL6xCOQTMHiCW7QiMIeI3/%E7%94%BB%E9%9D%A2%E9
 
 
 ### ER図
-[![Image from Gyazo](https://i.gyazo.com/あなたの画像ID.png)](https://gyazo.com/あなたの画像ID)
+https://gyazo.com/46774706321af44613b9bc12ae8d91f4
 
 ### 本サービスの概要（700文字以内）
 本サービスは、製造現場の監視カメラ(NxWitness)映像を、専用PCに依存せず社内LAN上のPCからWebブラウザで確認・共有できるWebアプリです。専用PCが他の人に使用中で映像を確認できない、トラブル発生時の映像共有に約20分かかるといった、製造ラインの技術員が抱える非効率な業務フローの解消を目的としています。
@@ -279,8 +279,7 @@ Figma: https://www.figma.com/design/kUL6xCOQTMHiCW7QiMIeI3/%E7%94%BB%E9%9D%A2%E9
 
 ### テーブル詳細
 #### usersテーブル
-- number : string / 社員番号(ログインID)
-- email : string / メールアドレス
+- email : string / ログイン用メールアドレス(ユニーク制約)
 - password : string / パスワード(暗号化して保存)
 - name : string / 表示名
 
@@ -289,20 +288,21 @@ Figma: https://www.figma.com/design/kUL6xCOQTMHiCW7QiMIeI3/%E7%94%BB%E9%9D%A2%E9
 - address : string / 接続先アドレス(NxWitness API)
 - line : string / 対象の製造ライン名
 
+#### camerasテーブル
+- server_id : bigint(FK) / 設置されているサーバー(serversを参照)
+- name : string / カメラ名(例: 1号機正面カメラ)
+
 #### clipsテーブル
 - user_id : bigint(FK) / 保存したユーザー(usersを参照)
-- server_id : bigint(FK) / 取得元のサーバー(serversを参照)
+- camera_id : bigint(FK) / 取得元のカメラ(camerasを参照)
 - title : string / クリップのタイトル
-- image : string / 保存した画像ファイル
+- file : string / 保存した画像・動画の実ファイル(パス)
+- media_type : string / 種別('image' または 'video')
 - taken_at : datetime / 映像取得日時
 - memo : text / メモ・報告内容
 
-### ER図の注意点
-- [x] 最新のER図スクリーンショットがPRに掲載されているか
-- [x] テーブル名は複数形になっているか
-- [x] カラムの型は記載されているか
-- [x] 外部キーは適切か
-- [x] リレーションは正しく描かれているか
-- [x] 多対多の関係になっていないか
-- [x] STIを使用していないか
-- [x] postsテーブルに post_name のような命名をしていないか
+### 補足(レビュー指摘への回答)
+- カメラ情報はNxWitnessから都度取得するのではなく、camerasテーブルとしてDBで管理する方針とした(1サーバーに複数カメラが接続されるため)
+- clipsはNxWitness側への参照ではなく、静止画・動画の実ファイルをアプリ側に保存する。NxWitness側のデータには影響を与えない
+- 過去映像の検索・再生は、NxWitness側に保存されている録画をAPI経由でその都度参照する。保存したいものだけをclipsとして保存し、保存済みのclipsは アプリ内で再生可能とする
+- ログインはemailのみを使用し、emailにユニーク制約を設ける。社員番号(number)は使用しない
