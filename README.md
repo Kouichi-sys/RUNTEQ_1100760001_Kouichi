@@ -256,7 +256,7 @@ Figma: https://www.figma.com/design/kUL6xCOQTMHiCW7QiMIeI3/%E7%94%BB%E9%9D%A2%E9
 
 
 ### ER図
-https://gyazo.com/46774706321af44613b9bc12ae8d91f4
+https://gyazo.com/234fb99846ab84d78ea06684c624a42e
 
 ### 本サービスの概要（700文字以内）
 本サービスは、製造現場の監視カメラ(NxWitness)映像を、専用PCに依存せず社内LAN上のPCからWebブラウザで確認・共有できるWebアプリです。専用PCが他の人に使用中で映像を確認できない、トラブル発生時の映像共有に約20分かかるといった、製造ラインの技術員が抱える非効率な業務フローの解消を目的としています。
