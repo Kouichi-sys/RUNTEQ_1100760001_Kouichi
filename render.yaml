@@ -5,6 +5,9 @@ databases:
     databaseName: nxwitnessviewer
     user: nxwitnessviewer
     plan: free
+    # Renderの内部接続はリージョンをまたげないため、
+    # webサービスと同じリージョンを明示する(未指定だと既定のoregonになる)
+    region: singapore
 
 services:
   - type: web
