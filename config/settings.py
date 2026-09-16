@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,13 +81,21 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
+# 開発時(docker compose)のみ、compose.ymlのdbサービスを既定の接続先にする。
+# 本番でDATABASE_URLが無いまま起動すると、開発用のホスト名で接続を試みて
+# 「Name or service not known」という分かりにくいエラーになるため、明示的に落とす。
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    if DEBUG:
+        DATABASE_URL = "postgres://postgres:postgres@db:5432/genba_camera"
+    else:
+        raise ImproperlyConfigured(
+            "環境変数 DATABASE_URL が設定されていません。"
+            "本番環境では接続先のデータベースを明示してください。"
+        )
+
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get(
-            "DATABASE_URL", "postgres://postgres:postgres@db:5432/genba_camera"
-        ),
-        conn_max_age=600,
-    )
+    "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
 }
 
 
