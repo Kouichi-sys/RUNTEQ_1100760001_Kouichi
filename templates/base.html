@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}NxWitnessViewer{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <header class="header">
+    <div class="header__inner">
+      <a class="logo" href="{% if user.is_authenticated %}{% url 'pages:home' %}{% else %}{% url 'accounts:login' %}{% endif %}">
+        {% include "_logo.html" %}
+        <span>NxWitnessViewer</span>
+      </a>
+      <nav class="header__nav">
+        {% if user.is_authenticated %}
+          <span class="header__user">{{ user.name }} さん</span>
+          <form action="{% url 'accounts:logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--primary btn--small">ログアウト</button>
+          </form>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    NxWitnessViewer — 社内LAN向け 現場映像確認・共有システム
+  </footer>
+</body>
+</html>
