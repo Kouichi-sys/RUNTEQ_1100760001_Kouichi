@@ -1,0 +1,302 @@
+/* ===== 全体 ===== */
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --border: #334155;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
+  --danger: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  /* フッターを最下部に固定するための土台 */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--accent);
+}
+
+/* ===== ヘッダー ===== */
+.header {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.header__inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.logo__mark {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.header__user {
+  color: var(--text-muted);
+}
+
+/* ===== 本文 ===== */
+.main {
+  flex: 1;
+  max-width: 1040px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+/* ===== ボタン ===== */
+.btn {
+  display: inline-block;
+  padding: 13px 40px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn--primary {
+  background: var(--accent);
+  color: #1f2937;
+}
+
+.btn--primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn--block {
+  display: block;
+  width: 100%;
+}
+
+/* ===== 特徴カード ===== */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 48px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.card__icon {
+  width: 36px;
+  height: 36px;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.card__title {
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+
+.card__text {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ===== フォーム ===== */
+.form-panel {
+  max-width: 400px;
+  margin: 40px auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.form-panel__title {
+  margin: 0 0 24px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.field__label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.field input {
+  width: 100%;
+  padding: 11px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+}
+
+.field input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.errors {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #fecaca;
+}
+
+.errors p {
+  margin: 0;
+}
+
+/* ===== フッター ===== */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 20px 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ===== スマホ ===== */
+@media (max-width: 600px) {
+  .main {
+    padding: 32px 20px;
+  }
+}
+
+/* ===== ログイン画面(トップページ) ===== */
+.login {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 56px;
+  align-items: center;
+  padding: 24px 0 48px;
+}
+
+.login__title {
+  font-size: 32px;
+  line-height: 1.45;
+  margin: 0 0 20px;
+}
+
+.login__accent {
+  color: var(--accent);
+}
+
+.login__lead {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin: 0;
+}
+
+.login .form-panel {
+  margin: 0;
+}
+
+.form-panel__note {
+  margin: 20px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (max-width: 860px) {
+  .login {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .login__title {
+    font-size: 24px;
+    text-align: center;
+  }
+  .login__lead {
+    text-align: center;
+  }
+  .login .form-panel {
+    margin: 0 auto;
+  }
+}
+
+/* ===== ページ見出し ===== */
+.page-head {
+  margin-bottom: 32px;
+}
+
+.page-head__title {
+  font-size: 26px;
+  margin: 0 0 6px;
+}
+
+.page-head__lead {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ===== ヘッダー内の小さいボタン ===== */
+.btn--small {
+  padding: 7px 16px;
+  font-size: 13px;
+}
+
+/* ===== 未実装機能のバッジ ===== */
+.card__status {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--text-muted);
+}

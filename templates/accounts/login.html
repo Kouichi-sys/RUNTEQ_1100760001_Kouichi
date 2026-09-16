@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}NxWitnessViewer | ログイン{% endblock %}
+
+{% block content %}
+<div class="login">
+  <div class="login__intro">
+    <h1 class="login__title">
+      専用PCまで行かなくても、<br>
+      <span class="login__accent">現場の映像</span>がすぐ見られる。
+    </h1>
+    <p class="login__lead">
+      製造現場の監視カメラ映像を、社内LAN上のどのPCからでもブラウザで確認できます。
+      トラブル時の映像はその場で保存して、報告書作成にそのまま使えます。
+    </p>
+  </div>
+
+  <div class="form-panel">
+    <h2 class="form-panel__title">ログイン</h2>
+
+    {% if form.non_field_errors %}
+      <div class="errors">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="field">
+        <label class="field__label" for="{{ form.username.id_for_label }}">メールアドレス</label>
+        {{ form.username }}
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="{{ form.password.id_for_label }}">パスワード</label>
+        {{ form.password }}
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--block">ログイン</button>
+    </form>
+
+    <p class="form-panel__note">社内アカウントでログインしてください。</p>
+  </div>
+</div>
+{% endblock %}
