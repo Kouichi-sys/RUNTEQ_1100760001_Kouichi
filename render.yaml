@@ -1,26 +1,26 @@
 # Render Blueprint。RenderのダッシュボードでBlueprintとして読み込むと、
 # Webサービスとデータベースをまとめて作成できる。
 databases:
-  - name: nxwitnessviewer-db-sg
+  - name: nxwitnessviewer-db
     databaseName: nxwitnessviewer
     user: nxwitnessviewer
     plan: free
-    # Renderの内部接続はリージョンをまたげないため、
-    # webサービスと同じリージョンを明示する(未指定だと既定のoregonになる)
-    region: singapore
+    # 既にoregonに作成済みのDBをそのまま使う(無料プランはDBを1つしか作れない)
+    region: oregon
 
 services:
   - type: web
-    name: nxwitnessviewer
+    name: nxwitness-viewer
     runtime: python
     plan: free
-    region: singapore
+    # Renderの内部接続はリージョンをまたげないため、DBと同じリージョンにする
+    region: oregon
     buildCommand: "./build.sh"
     startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: nxwitnessviewer-db-sg
+          name: nxwitnessviewer-db
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
