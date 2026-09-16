@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Django
+*.log
+db.sqlite3
+/staticfiles/
+/media/
+
+# 環境変数(秘密情報を含むためコミットしない)
+.env
+
+# エディタ・OS
+.vscode/
+.idea/
+.DS_Store
