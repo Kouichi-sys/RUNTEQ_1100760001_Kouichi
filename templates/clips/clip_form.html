@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}NxWitnessViewer | クリップの保存{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <p class="breadcrumb">
+    <a href="{% url 'pages:home' %}">ダッシュボード</a> /
+    <a href="{% url 'cameras:server_detail' camera.server.pk %}">{{ camera.server.name }}</a> /
+    <a href="{% url 'cameras:playback' camera.pk %}">{{ camera.name }} の過去映像</a> /
+    クリップの保存
+  </p>
+  <h1 class="page-head__title">クリップの保存</h1>
+  <p class="page-head__lead">指定した範囲の映像を切り取って保存します。</p>
+</section>
+
+{% if error %}
+  <section class="empty">
+    <p class="empty__text">{{ error }}</p>
+    <p class="empty__note">
+      <a href="{% url 'cameras:playback' camera.pk %}">過去映像に戻って範囲を指定し直す</a>
+    </p>
+  </section>
+{% else %}
+  <section class="clip-form">
+    <div class="clip-form__preview">
+      <img class="viewer__image" src="{{ preview_url }}" alt="{{ camera.name }} の映像">
+      <dl class="clip-range">
+        <div class="clip-range__row">
+          <dt>カメラ</dt><dd>{{ camera.server.name }} / {{ camera.name }}</dd>
+        </div>
+        <div class="clip-range__row">
+          <dt>開始</dt><dd>{{ start_at|date:"Y年n月j日(D) H:i:s" }}</dd>
+        </div>
+        <div class="clip-range__row">
+          <dt>終了</dt><dd>{{ end_at|date:"Y年n月j日(D) H:i:s" }}</dd>
+        </div>
+        <div class="clip-range__row">
+          <dt>長さ</dt><dd>{{ seconds }} 秒</dd>
+        </div>
+      </dl>
+    </div>
+
+    <form class="clip-form__panel" method="post" action="?{{ request.GET.urlencode }}">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="errors">
+          {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+      {% endif %}
+
+      {% for field in form %}
+        <div class="field">
+          <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="errors">
+              {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button type="submit" class="btn btn--primary btn--block">この範囲を保存する</button>
+      <p class="form-panel__note">
+        <a href="{% url 'cameras:playback' camera.pk %}">保存せずに戻る</a>
+      </p>
+    </form>
+  </section>
+{% endif %}
+{% endblock %}

@@ -44,10 +44,18 @@ class VideoSource(ABC):
 
     @abstractmethod
     def capture(self, camera, now):
-        """その時点の映像を切り出す。
+        """その時点の1コマを切り出す(スクリーンショット)。
 
         (ファイルの中身(bytes), 拡張子, media_type) を返す。
-        クリップ保存はこの戻り値をそのままファイルに書き出す。
+        保存処理はこの戻り値をそのままファイルに書き出す。
+        """
+
+    @abstractmethod
+    def capture_range(self, camera, start_at, end_at):
+        """開始から終了までを切り取る(クリップ)。
+
+        戻り値の形はcaptureと同じ。実機ではNxWitnessから該当区間の
+        動画を取得することを想定している。
         """
 
 
@@ -74,6 +82,13 @@ class MockVideoSource(VideoSource):
 
         svg = render_frame(camera, now, self.product_shape(camera))
         return svg.encode("utf-8"), "svg", "image"
+
+    def capture_range(self, camera, start_at, end_at):
+        from .mock_frame import render_stream
+
+        # 開始時点から動き続ける映像を保存する。長さはClip.secondsで持つ
+        svg = render_stream(camera, start_at, self.product_shape(camera))
+        return svg.encode("utf-8"), "svg", "video"
 
     def product_shape(self, camera):
         """カメラが属するラインから、流れる製品の形を決める。"""
@@ -108,6 +123,11 @@ class NxVideoSource(VideoSource):
     def capture(self, camera, now):
         raise NotImplementedError(
             "NxWitness APIからの映像取得は未実装です(Issue #25の疎通確認後に対応)。"
+        )
+
+    def capture_range(self, camera, start_at, end_at):
+        raise NotImplementedError(
+            "NxWitness APIからの区間切り出しは未実装です(Issue #25の疎通確認後に対応)。"
         )
 
 

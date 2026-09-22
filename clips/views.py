@@ -82,3 +82,95 @@ class ScreenshotCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         # マイページ(#15)ができるまでは、元のライブ画面に戻す
         return reverse("cameras:camera_live", args=[self.camera.pk])
+
+
+class ClipCreateView(LoginRequiredMixin, CreateView):
+    """過去映像から、開始と終了を指定した区間をクリップとして保存する。
+
+    1コマだけのスクリーンショットとは別で、media_typeがvideoになる。
+    """
+
+    model = Clip
+    form_class = ClipForm
+    template_name = "clips/clip_form.html"
+
+    # 長すぎるクリップは保存に時間がかかり、報告書にも使いにくい
+    MAX_SECONDS = 10 * 60
+    MIN_SECONDS = 1
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.camera = get_object_or_404(
+            Camera.objects.select_related("server"), pk=kwargs["camera_pk"]
+        )
+
+    def clip_range(self):
+        """指定された区間を読む。不正なら理由を添えて返す。
+
+        戻り値は (開始, 終了, エラー文言)。
+        """
+        now = timezone.now()
+        start = parse_datetime(self.request.GET.get("start", "") or "")
+        end = parse_datetime(self.request.GET.get("end", "") or "")
+
+        if not start or not end:
+            return None, None, "切り取る範囲が指定されていません。"
+        if end <= start:
+            return None, None, "終了は開始より後にしてください。"
+        if start > now or end > now:
+            return None, None, "未来の範囲は指定できません。"
+
+        seconds = (end - start).total_seconds()
+        if seconds < self.MIN_SECONDS:
+            return None, None, "範囲が短すぎます。1秒以上にしてください。"
+        if seconds > self.MAX_SECONDS:
+            return None, None, "範囲が長すぎます。10分以内にしてください。"
+
+        return start, end, None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        start, end, error = self.clip_range()
+        context["camera"] = self.camera
+        context["error"] = error
+
+        if error:
+            return context
+
+        context["start_at"] = timezone.localtime(start)
+        context["end_at"] = timezone.localtime(end)
+        context["seconds"] = int((end - start).total_seconds())
+
+        source = get_video_source()
+        if source.is_available():
+            # 切り取りの開始時点をプレビューに出す
+            query = urlencode({"at": start.isoformat()})
+            context["preview_url"] = f"{source.live_image_url(self.camera)}?{query}"
+        return context
+
+    def form_valid(self, form):
+        start, end, error = self.clip_range()
+        if error:
+            form.add_error(None, error)
+            return self.form_invalid(form)
+
+        content, extension, media_type = get_video_source().capture_range(
+            self.camera, timezone.localtime(start), timezone.localtime(end)
+        )
+
+        clip = form.save(commit=False)
+        clip.user = self.request.user
+        clip.camera = self.camera
+        clip.taken_at = start
+        clip.seconds = int((end - start).total_seconds())
+        clip.media_type = media_type
+        clip.file.save(f"clip.{extension}", ContentFile(content), save=False)
+        clip.save()
+
+        self.object = clip
+        messages.success(self.request, f"クリップ「{clip.title}」を保存しました。")
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        # マイページ(#15)ができるまでは、元の過去映像画面に戻す
+        return reverse("cameras:playback", args=[self.camera.pk])

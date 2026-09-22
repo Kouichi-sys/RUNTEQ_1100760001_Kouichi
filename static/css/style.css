@@ -566,3 +566,61 @@ input[type="time"] {
   border-color: var(--accent);
   color: var(--accent);
 }
+
+/* ===== クリップの範囲表示 ===== */
+.clip-range {
+  margin: 16px 0 0;
+  font-size: 14px;
+}
+
+.clip-range__row {
+  display: flex;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.clip-range__row dt {
+  width: 72px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.clip-range__row dd {
+  margin: 0;
+}
+
+/* ===== 範囲指定の操作 ===== */
+.range {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.range__label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.range__status {
+  font-size: 14px;
+  font-family: monospace;
+  color: var(--text);
+  min-width: 260px;
+  text-align: center;
+}
+
+.range__status--empty {
+  color: var(--text-muted);
+  font-family: inherit;
+}
+
+.btn--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

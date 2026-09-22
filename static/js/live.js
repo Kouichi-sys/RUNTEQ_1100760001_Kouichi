@@ -125,6 +125,82 @@
       });
   }
 
+  // ここから下はクリップの範囲指定。過去映像画面にだけ要素がある
+  const clip = document.getElementById("clip");
+  const rangeStatus = document.getElementById("range-status");
+  let clipStart = null;
+  let clipEnd = null;
+
+  function clockOnly(date) {
+    const p = (n) => String(n).padStart(2, "0");
+    return p(date.getHours()) + ":" + p(date.getMinutes()) + ":" + p(date.getSeconds());
+  }
+
+  function updateRange() {
+    if (!clip) {
+      return;
+    }
+    if (clipStart && clipEnd) {
+      // 逆に押されても困らないよう、早い方を開始にする
+      const from = clipStart < clipEnd ? clipStart : clipEnd;
+      const to = clipStart < clipEnd ? clipEnd : clipStart;
+      const seconds = Math.round((to - from) / 1000);
+      rangeStatus.textContent = clockOnly(from) + " 〜 " + clockOnly(to) + " (" + seconds + "秒)";
+      rangeStatus.classList.remove("range__status--empty");
+      clip.classList.remove("btn--disabled");
+      clip.setAttribute(
+        "href",
+        clip.dataset.url +
+          "?start=" + encodeURIComponent(from.toISOString()) +
+          "&end=" + encodeURIComponent(to.toISOString())
+      );
+      return;
+    }
+
+    if (clipStart) {
+      rangeStatus.textContent = "開始 " + clockOnly(clipStart) + " / 終了は未指定";
+    } else if (clipEnd) {
+      rangeStatus.textContent = "終了 " + clockOnly(clipEnd) + " / 開始は未指定";
+    } else {
+      rangeStatus.textContent = "未指定";
+    }
+    rangeStatus.classList.add("range__status--empty");
+    clip.classList.add("btn--disabled");
+    clip.removeAttribute("href");
+  }
+
+  document.querySelectorAll("[data-mark]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const kind = button.dataset.mark;
+      if (kind === "start") {
+        clipStart = currentTime();
+      } else if (kind === "end") {
+        clipEnd = currentTime();
+      } else {
+        clipStart = null;
+        clipEnd = null;
+      }
+      updateRange();
+    });
+  });
+
+  document.querySelectorAll("[data-around]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const half = Number(button.dataset.around) * 1000;
+      const center = currentTime();
+      const now = new Date();
+      let to = new Date(center.getTime() + half);
+      if (to > now) {
+        to = now;
+      }
+      clipStart = new Date(center.getTime() - half);
+      clipEnd = to;
+      updateRange();
+    });
+  });
+
+  updateRange();
+
   toggle.addEventListener("click", function () {
     if (paused) {
       play();
