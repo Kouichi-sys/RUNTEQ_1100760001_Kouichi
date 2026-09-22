@@ -487,3 +487,32 @@ a {
   border-radius: 4px;
   padding: 2px 8px;
 }
+
+/* ===== 過去映像の日時指定 ===== */
+.search {
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  margin-bottom: 8px;
+}
+
+.search__form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.field--inline {
+  margin: 0;
+}
+
+.search__shortcuts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.viewer__badge--playback {
+  color: #bae6fd;
+}

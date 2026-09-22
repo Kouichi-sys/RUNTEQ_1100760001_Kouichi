@@ -1,17 +1,36 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}NxWitnessViewer | {{ camera.name }}{% endblock %}
+{% block title %}NxWitnessViewer | {{ camera.name }} の過去映像{% endblock %}
 
 {% block content %}
 <section class="page-head">
   <p class="breadcrumb">
     <a href="{% url 'pages:home' %}">ダッシュボード</a> /
     <a href="{% url 'cameras:server_detail' camera.server.pk %}">{{ camera.server.name }}</a> /
-    {{ camera.name }}
+    <a href="{% url 'cameras:camera_live' camera.pk %}">{{ camera.name }}</a> /
+    過去映像
   </p>
-  <h1 class="page-head__title">{{ camera.name }}</h1>
+  <h1 class="page-head__title">{{ camera.name }} の過去映像</h1>
   <p class="page-head__lead">{{ camera.server.line }} / {{ camera.server.name }}</p>
+</section>
+
+<section class="search">
+  <form class="search__form" method="get">
+    <div class="field field--inline">
+      <label class="field__label" for="at">再生を開始する日時</label>
+      <input type="datetime-local" id="at" name="at" value="{{ form_value }}" max="{{ max_value }}">
+    </div>
+    <button type="submit" class="btn btn--primary btn--small">この日時から再生</button>
+  </form>
+  <div class="search__shortcuts">
+    {% for shortcut in shortcuts %}
+      <a class="btn btn--small" href="?at={{ shortcut.value }}">{{ shortcut.label }}</a>
+    {% endfor %}
+  </div>
+  {% if error %}
+    <div class="errors"><p>{{ error }}</p></div>
+  {% endif %}
 </section>
 
 {% if source_available %}
@@ -19,7 +38,7 @@
     <div class="viewer__stage" id="stage" data-started-at="{{ started_at }}">
       {{ stream_markup|safe }}
       <div class="viewer__hud">
-        <span class="viewer__badge" id="badge">● LIVE</span>
+        <span class="viewer__badge viewer__badge--playback" id="badge">▶ 再生中</span>
         <span class="viewer__clock" id="clock"></span>
       </div>
     </div>
@@ -29,10 +48,9 @@
       <a class="btn btn--primary btn--small" id="screenshot" href="{% url 'clips:screenshot' camera.pk %}">
         スクリーンショット
       </a>
-      <a class="btn btn--small" href="{% url 'cameras:playback' camera.pk %}">過去映像を見る</a>
     </div>
-    <p class="viewer__note" id="hint">
-      気になる場面で一時停止すると、その1コマをスクリーンショットとして保存できます。
+    <p class="viewer__note">
+      巻き戻し・早送りと、範囲を指定したクリップ保存はこの後で追加します。
     </p>
   </section>
 
