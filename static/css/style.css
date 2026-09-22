@@ -542,3 +542,27 @@ input[type="date"],
 input[type="time"] {
   color-scheme: dark;
 }
+
+/* ===== 再生操作 ===== */
+.viewer__bar {
+  flex-wrap: wrap;
+}
+
+.viewer__rates {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.viewer__rates-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.btn--active {
+  border-color: var(--accent);
+  color: var(--accent);
+}

@@ -44,7 +44,8 @@
 
 {% if source_available %}
   <section class="viewer">
-    <div class="viewer__stage" id="stage" data-started-at="{{ started_at }}">
+    <div class="viewer__stage" id="stage" data-started-at="{{ started_at }}"
+         data-stream-url="{% url 'cameras:stream' camera.pk %}">
       {{ stream_markup|safe }}
       <div class="viewer__hud">
         <span class="viewer__badge viewer__badge--playback" id="badge">▶ 再生中</span>
@@ -54,13 +55,27 @@
 
     <div class="viewer__bar">
       <a class="btn btn--small" href="{% url 'cameras:camera_live' camera.pk %}">● ライブに戻る</a>
+      <button type="button" class="btn btn--small" data-jump="-60">&laquo; 1分</button>
+      <button type="button" class="btn btn--small" data-jump="-10">&laquo; 10秒</button>
       <button type="button" class="btn btn--small" id="toggle">一時停止</button>
+      <button type="button" class="btn btn--small" data-jump="10">10秒 &raquo;</button>
+      <button type="button" class="btn btn--small" data-jump="60">1分 &raquo;</button>
       <a class="btn btn--primary btn--small" id="screenshot" href="{% url 'clips:screenshot' camera.pk %}">
         スクリーンショット
       </a>
     </div>
+
+    <div class="viewer__rates">
+      <span class="viewer__rates-label">再生速度</span>
+      <button type="button" class="btn btn--small" data-rate="0.5">0.5倍</button>
+      <button type="button" class="btn btn--small" data-rate="1">1倍</button>
+      <button type="button" class="btn btn--small" data-rate="2">2倍</button>
+      <button type="button" class="btn btn--small" data-rate="4">4倍</button>
+    </div>
+
     <p class="viewer__note">
-      巻き戻し・早送りと、範囲を指定したクリップ保存はこの後で追加します。
+      見たい場面まで移動して一時停止すると、その1コマをスクリーンショットとして保存できます。
+      範囲を指定したクリップ保存はこの後で追加します。
     </p>
   </section>
 

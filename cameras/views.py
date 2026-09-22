@@ -127,6 +127,24 @@ class PlaybackView(CameraViewerMixin, LoginRequiredMixin, DetailView):
         return context
 
 
+class StreamView(LoginRequiredMixin, View):
+    """指定した時刻から始まる映像を返す。
+
+    巻き戻し・早送りで再生位置が変わったとき、画面側がこれを取得して
+    映像を差し替える。
+    """
+
+    def get(self, request, pk):
+        source = get_video_source()
+        camera = get_object_or_404(Camera.objects.select_related("server"), pk=pk)
+        at = parse_datetime(request.GET.get("at", "")) or timezone.now()
+
+        markup = source.stream_markup(camera, timezone.localtime(at))
+        response = HttpResponse(markup, content_type="image/svg+xml")
+        response["Cache-Control"] = "no-store, max-age=0"
+        return response
+
+
 class LiveImageView(LoginRequiredMixin, View):
     """疑似ライブ映像(SVG)を返す。
 
