@@ -40,7 +40,10 @@
       <button type="submit" class="btn btn--primary btn--block">ログイン</button>
     </form>
 
-    <p class="form-panel__note">社内アカウントでログインしてください。</p>
+    <p class="form-panel__note">
+      社内アカウントでログインしてください。<br>
+      はじめての方は <a href="{% url 'accounts:signup' %}">新規登録</a>
+    </p>
   </div>
 </div>
 {% endblock %}
