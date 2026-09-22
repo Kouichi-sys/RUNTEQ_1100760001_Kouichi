@@ -506,6 +506,12 @@ a {
   margin: 0;
 }
 
+/* 横並びのフォームでは入力欄を内容に合わせる */
+.field--inline input {
+  width: auto;
+  min-width: 150px;
+}
+
 .search__shortcuts {
   display: flex;
   gap: 8px;
@@ -515,4 +521,23 @@ a {
 
 .viewer__badge--playback {
   color: #bae6fd;
+}
+
+.search__shortcuts-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  align-self: center;
+  margin-right: 4px;
+}
+
+.search__current {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* 日付・時刻入力のカレンダーアイコンを見やすくする */
+input[type="date"],
+input[type="time"] {
+  color-scheme: dark;
 }
