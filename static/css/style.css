@@ -710,3 +710,54 @@ input[type="time"] {
 .empty__action {
   margin: 16px 0 0;
 }
+
+/* ===== クリップ詳細 ===== */
+.detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+  gap: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+}
+
+@media (max-width: 760px) {
+  .detail {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail__panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.detail__memo {
+  margin-top: 20px;
+}
+
+.detail__memo-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.detail__memo-body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.detail__memo-body--empty {
+  color: var(--text-muted);
+}
+
+.detail__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}

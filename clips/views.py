@@ -1,16 +1,17 @@
+import re
 from datetime import timedelta
 from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import ContentFile
-from django.http import FileResponse, Http404, HttpResponseRedirect
+from django.http import FileResponse, Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.views import View
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, DetailView, ListView
 
 from cameras.models import Camera
 from cameras.video_sources import get_video_source
@@ -223,3 +224,48 @@ class ClipFileView(LoginRequiredMixin, View):
 
         content_type = "image/svg+xml" if clip.file.name.endswith(".svg") else None
         return FileResponse(clip.file.open("rb"), content_type=content_type)
+
+
+class ClipDetailView(LoginRequiredMixin, DetailView):
+    """保存した1件の詳細。映像・メモ・撮影元を確認できる。
+
+    保存した本人だけが開ける。他人のものは存在ごと隠す(404)。
+    """
+
+    model = Clip
+    template_name = "clips/clip_detail.html"
+    context_object_name = "clip"
+
+    def get_queryset(self):
+        return Clip.objects.filter(user=self.request.user).select_related(
+            "camera", "camera__server"
+        )
+
+
+class ClipThumbnailView(LoginRequiredMixin, View):
+    """一覧に並べるための静止画を返す。
+
+    クリップ(動画)をそのまま一覧に並べると、開いた枚数だけ映像が動き続けて
+    画面が重くなる。一覧では動きを止めた絵を返し、詳細画面でだけ再生する。
+
+    mockの映像はSVGなので、アニメーションの指定を外すだけで静止画になる。
+    実機の動画(mp4など)に切り替えるときは、NxWitnessのサムネイルを使う。
+    """
+
+    # 生成したSVGのアニメーション定義。これを外すと最初のコマで止まる
+    STYLE_PATTERN = re.compile(r"<style>.*?</style>", re.DOTALL)
+
+    def get(self, request, pk):
+        clip = get_object_or_404(Clip, pk=pk, user=request.user)
+        if not clip.file or not clip.file.storage.exists(clip.file.name):
+            raise Http404("ファイルが見つかりません。")
+
+        # 静止画はそのまま返す
+        if not clip.is_video or not clip.file.name.endswith(".svg"):
+            return FileResponse(clip.file.open("rb"), content_type="image/svg+xml")
+
+        with clip.file.open("rb") as stored:
+            svg = stored.read().decode("utf-8")
+        return HttpResponse(
+            self.STYLE_PATTERN.sub("", svg), content_type="image/svg+xml"
+        )
