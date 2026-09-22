@@ -10,4 +10,9 @@ urlpatterns = [
         views.ScreenshotCreateView.as_view(),
         name="screenshot",
     ),
+    path(
+        "cameras/<int:camera_pk>/clip/",
+        views.ClipCreateView.as_view(),
+        name="clip",
+    ),
 ]

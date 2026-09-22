@@ -65,6 +65,23 @@
       </a>
     </div>
 
+    <div class="range">
+      <span class="range__label">クリップの範囲</span>
+      <button type="button" class="btn btn--small" data-mark="start">開始をセット</button>
+      <button type="button" class="btn btn--small" data-mark="end">終了をセット</button>
+      <span class="range__status range__status--empty" id="range-status">未指定</span>
+      <a class="btn btn--primary btn--small btn--disabled" id="clip"
+         data-url="{% url 'clips:clip' camera.pk %}">クリップを保存</a>
+      <button type="button" class="btn btn--small" data-mark="clear">クリア</button>
+    </div>
+
+    <div class="range">
+      <span class="range__label">よく使う範囲</span>
+      <button type="button" class="btn btn--small" data-around="30">この前後30秒</button>
+      <button type="button" class="btn btn--small" data-around="60">この前後1分</button>
+      <button type="button" class="btn btn--small" data-around="180">この前後3分</button>
+    </div>
+
     <div class="viewer__rates">
       <span class="viewer__rates-label">再生速度</span>
       <button type="button" class="btn btn--small" data-rate="0.5">0.5倍</button>
@@ -74,8 +91,8 @@
     </div>
 
     <p class="viewer__note">
-      見たい場面まで移動して一時停止すると、その1コマをスクリーンショットとして保存できます。
-      範囲を指定したクリップ保存はこの後で追加します。
+      トラブルの始まりで「開始をセット」、終わりで「終了をセット」を押すと、その範囲をクリップとして保存できます。<br>
+      1コマだけ残したいときは「スクリーンショット」を使ってください。
     </p>
   </section>
 
