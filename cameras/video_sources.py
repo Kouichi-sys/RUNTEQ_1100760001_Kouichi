@@ -34,6 +34,14 @@ class VideoSource(ABC):
     def is_available(self):
         """映像を取得できる状態かどうか。"""
 
+    @abstractmethod
+    def capture(self, camera, now):
+        """その時点の映像を切り出す。
+
+        (ファイルの中身(bytes), 拡張子, media_type) を返す。
+        クリップ保存はこの戻り値をそのままファイルに書き出す。
+        """
+
 
 class MockVideoSource(VideoSource):
     """アプリ側で生成した疑似映像を返す。
@@ -47,6 +55,12 @@ class MockVideoSource(VideoSource):
 
     def is_available(self):
         return True
+
+    def capture(self, camera, now):
+        from .mock_frame import render_frame
+
+        svg = render_frame(camera, now, self.product_shape(camera))
+        return svg.encode("utf-8"), "svg", "image"
 
     def product_shape(self, camera):
         """カメラが属するラインから、流れる製品の形を決める。"""
@@ -72,6 +86,11 @@ class NxVideoSource(VideoSource):
 
     def is_available(self):
         return bool(settings.NX_BASE_URL)
+
+    def capture(self, camera, now):
+        raise NotImplementedError(
+            "NxWitness APIからの映像取得は未実装です(Issue #25の疎通確認後に対応)。"
+        )
 
 
 def get_video_source():

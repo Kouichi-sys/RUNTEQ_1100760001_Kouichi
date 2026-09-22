@@ -400,3 +400,39 @@ a {
   margin: 4px 0 0;
   padding-left: 18px;
 }
+
+/* ===== クリップ保存 ===== */
+.clip-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+  gap: 28px;
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+}
+
+.clip-form__panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+@media (max-width: 760px) {
+  .clip-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+.messages {
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.messages__item {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 14px;
+}

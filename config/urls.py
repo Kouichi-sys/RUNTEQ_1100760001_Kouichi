@@ -7,6 +7,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("home/", include("pages.urls")),
     path("", include("cameras.urls")),
+    path("", include("clips.urls")),
     # "/" をログイン画面にするため、最後に置く
     path("", include("accounts.urls")),
 ]

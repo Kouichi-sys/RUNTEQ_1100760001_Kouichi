@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}NxWitnessViewer | クリップの保存{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <p class="breadcrumb">
+    <a href="{% url 'pages:home' %}">ダッシュボード</a> /
+    <a href="{% url 'cameras:server_detail' camera.server.pk %}">{{ camera.server.name }}</a> /
+    <a href="{% url 'cameras:camera_live' camera.pk %}">{{ camera.name }}</a> /
+    クリップの保存
+  </p>
+  <h1 class="page-head__title">クリップの保存</h1>
+  <p class="page-head__lead">保存ボタンを押した時点の映像を切り出して保存します。</p>
+</section>
+
+<section class="clip-form">
+  <div class="clip-form__preview">
+    <img class="viewer__image" src="{{ live_image_url }}" alt="{{ camera.name }} の映像">
+    <p class="viewer__note">{{ camera.server.name }} / {{ camera.name }}</p>
+  </div>
+
+  <form class="clip-form__panel" method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="field">
+        <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="errors">
+            {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn--primary btn--block">この映像を保存する</button>
+    <p class="form-panel__note">
+      <a href="{% url 'cameras:camera_live' camera.pk %}">保存せずに戻る</a>
+    </p>
+  </form>
+</section>
+{% endblock %}
