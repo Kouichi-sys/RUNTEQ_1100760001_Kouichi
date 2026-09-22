@@ -3,25 +3,31 @@ from django.core.management.base import BaseCommand
 
 from cameras.models import Camera, Server
 
-# レビュー用のサンプル構成(製造ライン3本ぶんのカメラ列)
+# レビュー用のサンプル構成(ビール工場の製造ライン4列)
 DEMO_SERVERS = [
     {
-        "name": "A列サーバー",
+        "name": "缶2号列",
         "address": "https://192.168.10.11:7001",
-        "line": "第1製造ライン",
-        "cameras": ["1号機 正面", "1号機 側面", "搬送コンベア 入口"],
+        "line": "缶ライン",
+        "cameras": ["充填機", "シーマー(巻締機)", "パレタイザ"],
     },
     {
-        "name": "B列サーバー",
+        "name": "缶3号列",
         "address": "https://192.168.10.12:7001",
-        "line": "第2製造ライン",
-        "cameras": ["2号機 正面", "2号機 充填部", "検査装置 出口"],
+        "line": "缶ライン",
+        "cameras": ["充填機", "シーマー(巻締機)", "ケーサー"],
     },
     {
-        "name": "C列サーバー",
+        "name": "瓶列",
         "address": "https://192.168.10.13:7001",
-        "line": "梱包ライン",
-        "cameras": ["梱包機 全体", "パレタイザ"],
+        "line": "瓶ライン",
+        "cameras": ["洗瓶機", "充填機", "ラベラー"],
+    },
+    {
+        "name": "樽列",
+        "address": "https://192.168.10.14:7001",
+        "line": "樽ライン",
+        "cameras": ["樽洗浄機", "充填機", "パレタイザ"],
     },
 ]
 
@@ -66,7 +72,19 @@ class Command(BaseCommand):
             for camera_name in entry["cameras"]:
                 Camera.objects.get_or_create(server=server, name=camera_name)
 
+            # 構成を変えたときに古いカメラが残らないようにする
+            removed = server.cameras.exclude(name__in=entry["cameras"]).delete()[0]
+
             action = "作成" if created else "更新"
-            self.stdout.write(f"{server.name} を{action}しました(カメラ {len(entry['cameras'])} 台)")
+            note = f" / 古いカメラ {removed} 台を削除" if removed else ""
+            self.stdout.write(
+                f"{server.name} を{action}しました(カメラ {len(entry['cameras'])} 台){note}"
+            )
+
+        # 定義から外したサーバーを残さない(カメラも一緒に消える)
+        stale = Server.objects.exclude(name__in=[e["name"] for e in DEMO_SERVERS])
+        for name in stale.values_list("name", flat=True):
+            self.stdout.write(f"{name} は定義から外れたため削除します")
+        stale.delete()
 
         self.stdout.write(self.style.SUCCESS("デモ用のサーバー・カメラを用意しました。"))
