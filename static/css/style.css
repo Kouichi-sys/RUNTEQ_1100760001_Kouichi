@@ -335,3 +335,57 @@ a {
   font-size: 14px;
   color: var(--text-muted);
 }
+
+/* ===== ライブ映像 ===== */
+.card--camera {
+  padding: 12px;
+}
+
+.thumb {
+  display: block;
+  width: 100%;
+  border-radius: 6px;
+  background: #0c1119;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.card--camera .card__title {
+  margin: 10px 4px 2px;
+}
+
+.viewer {
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+}
+
+.viewer__image {
+  display: block;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #0c1119;
+  aspect-ratio: 16 / 9;
+}
+
+.viewer__bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.viewer__status {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.viewer__note {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}

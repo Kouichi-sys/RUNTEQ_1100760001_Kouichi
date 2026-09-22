@@ -6,21 +6,16 @@
 <section class="page-head">
   <p class="breadcrumb"><a href="{% url 'pages:home' %}">ダッシュボード</a> / {{ server.name }}</p>
   <h1 class="page-head__title">{{ server.name }}</h1>
-  <p class="page-head__lead">{{ server.line }} に設置されたカメラの一覧です。</p>
+  <p class="page-head__lead">{{ server.line }} に設置されたカメラの一覧です。見たいカメラを選ぶと大きく表示できます。</p>
 </section>
 
 {% if server.cameras.all %}
   <section class="features">
     {% for camera in server.cameras.all %}
-      <div class="card">
-        <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <rect x="2" y="6" width="14" height="12" rx="2"/>
-          <path d="M16 10l6-3v10l-6-3"/>
-        </svg>
+      <a class="card card--link card--camera" href="{% url 'cameras:camera_live' camera.pk %}">
+        <img class="thumb" src="{% url 'cameras:live_image' camera.pk %}" alt="{{ camera.name }} の映像">
         <h2 class="card__title">{{ camera.name }}</h2>
-        <p class="card__text">ライブ映像の表示は Issue #10 で対応します。</p>
-        <span class="card__status">準備中</span>
-      </div>
+      </a>
     {% endfor %}
   </section>
 {% else %}

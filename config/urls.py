@@ -6,7 +6,7 @@ from django.urls import include, path
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("home/", include("pages.urls")),
-    path("servers/", include("cameras.urls")),
+    path("", include("cameras.urls")),
     # "/" をログイン画面にするため、最後に置く
     path("", include("accounts.urls")),
 ]
