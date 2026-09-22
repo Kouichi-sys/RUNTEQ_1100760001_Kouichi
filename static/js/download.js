@@ -11,19 +11,21 @@
 
   const sourceUrl = button.dataset.source;
   const fileName = button.dataset.filename;
+  // 変換中に文言を差し替えるため、元の表記を覚えておく
+  const label = button.textContent;
   // 変換後の大きさ。映像と同じ16:9
   const WIDTH = 1280;
   const HEIGHT = 720;
 
   function fail(message) {
     button.disabled = false;
-    button.textContent = "PNGでダウンロード";
+    button.textContent = label;
     window.alert(message);
   }
 
   button.addEventListener("click", function () {
     button.disabled = true;
-    button.textContent = "変換中…";
+    button.textContent = "準備中…";
 
     fetch(sourceUrl)
       .then(function (response) {
@@ -61,7 +63,7 @@
             URL.revokeObjectURL(link.href);
 
             button.disabled = false;
-            button.textContent = "PNGでダウンロード";
+            button.textContent = label;
           }, "image/png");
         };
 

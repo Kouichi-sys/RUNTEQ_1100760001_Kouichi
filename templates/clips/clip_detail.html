@@ -68,21 +68,18 @@
 
     <div class="detail__actions">
       {% if clip.is_video %}
-        <a class="btn btn--primary btn--small" href="{% url 'clips:download' clip.pk %}">動画でダウンロード</a>
-        <button type="button" class="btn btn--small" id="download-png"
-                data-source="{% url 'clips:thumbnail' clip.pk %}"
-                data-filename="{{ clip.png_name }}">この1コマをPNG</button>
+        <a class="btn btn--primary btn--small" href="{% url 'clips:download' clip.pk %}">動画をダウンロード</a>
       {% else %}
         <button type="button" class="btn btn--primary btn--small" id="download-png"
                 data-source="{% url 'clips:thumbnail' clip.pk %}"
-                data-filename="{{ clip.png_name }}">PNGでダウンロード</button>
+                data-filename="{{ clip.png_name }}">スクリーンショットをダウンロード</button>
       {% endif %}
     </div>
     <p class="detail__note">
       {% if clip.is_video %}
-        動画はGIF形式で書き出します。メールに添付してそのまま再生できます。
+        メールに添付して、そのまま再生できます。
       {% else %}
-        PNGはメールへの添付や報告書への貼り付けに使えます。
+        メールへの添付や、報告書への貼り付けに使えます。
       {% endif %}
     </p>
 
