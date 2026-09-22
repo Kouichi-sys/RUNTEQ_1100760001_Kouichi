@@ -63,6 +63,7 @@ a {
 }
 
 .header__nav {
+  flex-wrap: wrap;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -650,4 +651,62 @@ input[type="time"] {
   font-size: 13px;
   color: var(--danger);
   min-height: 18px;
+}
+
+/* ===== マイページ ===== */
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  margin-bottom: 24px;
+}
+
+.card__status--video {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.card__memo {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.pagination__status {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.header__link {
+  font-size: 14px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.header__link:hover {
+  color: var(--accent);
+}
+
+/* いま開いている画面が分かるようにする */
+.header__link--current {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 2px;
+}
+
+
+.empty__action {
+  margin: 16px 0 0;
 }

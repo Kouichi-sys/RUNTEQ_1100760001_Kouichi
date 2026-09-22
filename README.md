@@ -261,7 +261,7 @@ Figma: https://www.figma.com/design/kUL6xCOQTMHiCW7QiMIeI3/%E7%94%BB%E9%9D%A2%E9
 - [x] 画像一覧表示機能(静止画・通信帯域への配慮)
 - [x] スクリーンショット保存機能(表示中の1コマを画像として保存)
 - [x] 映像のクリップ保存機能(開始・終了を指定して動画を切り取り)
-- [ ] マイページ機能(保存済みクリップ一覧)
+- [x] マイページ機能(保存済みクリップ一覧)
 - [ ] クリップ詳細閲覧機能
 - [ ] クリップ編集機能
 - [ ] クリップ削除機能
@@ -375,5 +375,7 @@ docker compose exec web python manage.py create_demo_cameras
 | `/cameras/<id>/playback/` | 過去映像の再生(日時指定) | 必須 |
 | `/cameras/<id>/screenshot/` | スクリーンショットの保存 | 必須 |
 | `/cameras/<id>/clip/` | クリップの保存(範囲を指定) | 必須 |
+| `/mypage/` | マイページ(自分の保存一覧) | 必須 |
+| `/clips/<id>/file/` | 保存したファイルの取得(本人のみ) | 必須 |
 | `/logout/` | ログアウト | 必須 |
 | `/admin/` | Django管理画面 | 必須(管理者) |
