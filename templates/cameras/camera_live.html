@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}NxWitnessViewer | {{ camera.name }}{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <p class="breadcrumb">
+    <a href="{% url 'pages:home' %}">ダッシュボード</a> /
+    <a href="{% url 'cameras:server_detail' camera.server.pk %}">{{ camera.server.name }}</a> /
+    {{ camera.name }}
+  </p>
+  <h1 class="page-head__title">{{ camera.name }}</h1>
+  <p class="page-head__lead">{{ camera.server.line }} / {{ camera.server.name }}</p>
+</section>
+
+{% if source_available %}
+  <section class="viewer">
+    <img id="live" class="viewer__image" src="{{ live_image_url }}" alt="{{ camera.name }} のライブ映像">
+    <div class="viewer__bar">
+      <span class="viewer__status" id="status">更新中</span>
+      <button type="button" class="btn btn--small" id="toggle">一時停止</button>
+    </div>
+    <p class="viewer__note">
+      通信量を抑えるため、動画ではなく静止画を一定間隔で取得しています。
+    </p>
+  </section>
+
+  {{ refresh_seconds|json_script:"refresh-seconds" }}
+  <script src="{% static 'js/live.js' %}"></script>
+{% else %}
+  <section class="empty">
+    <p class="empty__text">映像を取得できませんでした。</p>
+    <p class="empty__note">NxWitnessサーバーへの接続設定を確認してください。</p>
+  </section>
+{% endif %}
+{% endblock %}

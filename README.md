@@ -254,7 +254,7 @@ Figma: https://www.figma.com/design/kUL6xCOQTMHiCW7QiMIeI3/%E7%94%BB%E9%9D%A2%E9
 ### READMEに記載した機能
 - [x] ユーザー認証機能(社内アカウントによるログイン)
 - [x] ログアウト機能
-- [ ] ライブ映像閲覧機能
+- [x] ライブ映像閲覧機能
 - [ ] 画像一覧表示機能(静止画・通信帯域への配慮)
 - [ ] 映像のクリップ・ブックマーク保存機能
 - [ ] マイページ機能(保存済みクリップ一覧)
@@ -363,5 +363,6 @@ docker compose exec web python manage.py create_demo_cameras
 | `/` | ログイン画面(トップページ) | 不要 |
 | `/home/` | ダッシュボード(カメラ列=サーバーの選択) | 必須 |
 | `/servers/<id>/` | 選択したカメラ列のカメラ一覧 | 必須 |
+| `/cameras/<id>/` | カメラ1台のライブ映像 | 必須 |
 | `/logout/` | ログアウト | 必須 |
 | `/admin/` | Django管理画面 | 必須(管理者) |
