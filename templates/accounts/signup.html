@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}NxWitnessViewer | 新規登録{% endblock %}
+
+{% block content %}
+<div class="form-panel">
+  <h2 class="form-panel__title">新規登録</h2>
+
+  {% if form.non_field_errors %}
+    <div class="errors">
+      {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="field">
+        <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+          <p class="field__help">{{ field.help_text|safe }}</p>
+        {% endif %}
+        {% if field.errors %}
+          <div class="errors">
+            {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn--primary btn--block">登録してはじめる</button>
+  </form>
+
+  <p class="form-panel__note">
+    アカウントをお持ちの方は <a href="{% url 'accounts:login' %}">ログイン</a>
+  </p>
+</div>
+{% endblock %}
