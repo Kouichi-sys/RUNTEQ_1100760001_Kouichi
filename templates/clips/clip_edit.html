@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}NxWitnessViewer | {{ clip.title }} の編集{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <p class="breadcrumb">
+    <a href="{% url 'pages:home' %}">ダッシュボード</a> /
+    <a href="{% url 'clips:mypage' %}">マイページ</a> /
+    <a href="{% url 'clips:detail' clip.pk %}">{{ clip.title }}</a> /
+    編集
+  </p>
+  <h1 class="page-head__title">タイトルとメモの編集</h1>
+  <p class="page-head__lead">映像はそのままで、タイトルとメモだけを書き直せます。</p>
+</section>
+
+<section class="clip-form">
+  <div class="clip-form__preview">
+    <img class="viewer__image" src="{% url 'clips:thumbnail' clip.pk %}" alt="{{ clip.title }}">
+    <dl class="clip-range">
+      <div class="clip-range__row">
+        <dt>種別</dt>
+        <dd>{% if clip.is_video %}クリップ({{ clip.seconds }}秒){% else %}スクリーンショット{% endif %}</dd>
+      </div>
+      <div class="clip-range__row">
+        <dt>カメラ</dt><dd>{{ clip.camera.server.name }} / {{ clip.camera.name }}</dd>
+      </div>
+      <div class="clip-range__row">
+        <dt>{% if clip.is_video %}開始日時{% else %}日時{% endif %}</dt>
+        <dd>{{ clip.taken_at|date:"Y年n月j日(D) H:i:s" }}</dd>
+      </div>
+    </dl>
+  </div>
+
+  <form class="clip-form__panel" method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="errors">
+        {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+      </div>
+    {% endif %}
+
+    {% for field in form %}
+      <div class="field">
+        <label class="field__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="errors">
+            {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn--primary btn--block">更新する</button>
+    <p class="form-panel__note">
+      <a href="{% url 'clips:detail' clip.pk %}">変更せずに戻る</a>
+    </p>
+  </form>
+</section>
+{% endblock %}
