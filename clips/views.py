@@ -269,3 +269,26 @@ class ClipThumbnailView(LoginRequiredMixin, View):
         return HttpResponse(
             self.STYLE_PATTERN.sub("", svg), content_type="image/svg+xml"
         )
+
+
+class ClipDownloadView(LoginRequiredMixin, View):
+    """保存したファイルをPCにダウンロードさせる。
+
+    閲覧用(ClipFileView)と同じく、保存した本人だけが取得できる。
+    報告書に添付できるよう、中身が分かるファイル名を付ける。
+    """
+
+    def get(self, request, pk):
+        clip = get_object_or_404(
+            Clip.objects.select_related("camera", "camera__server"),
+            pk=pk,
+            user=request.user,
+        )
+        if not clip.file or not clip.file.storage.exists(clip.file.name):
+            raise Http404("ファイルが見つかりません。")
+
+        return FileResponse(
+            clip.file.open("rb"),
+            as_attachment=True,
+            filename=clip.download_name,
+        )

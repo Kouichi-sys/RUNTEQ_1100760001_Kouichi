@@ -66,6 +66,7 @@
     </div>
 
     <div class="detail__actions">
+      <a class="btn btn--primary btn--small" href="{% url 'clips:download' clip.pk %}">ダウンロード</a>
       <a class="btn btn--small" href="{% url 'cameras:camera_live' clip.camera.pk %}">このカメラを見る</a>
       <a class="btn btn--small" href="{% url 'clips:mypage' %}">マイページに戻る</a>
     </div>
