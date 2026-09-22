@@ -18,16 +18,17 @@ from .forms import ClipForm
 from .models import Clip
 
 
-class ClipCreateView(LoginRequiredMixin, CreateView):
-    """いま見ている映像をクリップとして保存する。
+class ScreenshotCreateView(LoginRequiredMixin, CreateView):
+    """いま見ている映像の1コマをスクリーンショットとして保存する。
 
-    映像の実体は保存操作をした時点で切り出す。ファイルはMEDIA_ROOT配下に置き、
-    DBにはパスだけを持つ(NxWitness側のデータには一切手を加えない)。
+    区間を切り取るクリップ(動画)とは別の機能で、media_typeがimageになる。
+    ファイルはMEDIA_ROOT配下に置き、DBにはパスだけを持つ
+    (NxWitness側のデータには一切手を加えない)。
     """
 
     model = Clip
     form_class = ClipForm
-    template_name = "clips/clip_form.html"
+    template_name = "clips/screenshot_form.html"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -75,7 +76,7 @@ class ClipCreateView(LoginRequiredMixin, CreateView):
         clip.save()
 
         self.object = clip
-        messages.success(self.request, f"「{clip.title}」を保存しました。")
+        messages.success(self.request, f"スクリーンショット「{clip.title}」を保存しました。")
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):

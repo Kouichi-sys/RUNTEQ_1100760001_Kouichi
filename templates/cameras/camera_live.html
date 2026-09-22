@@ -26,12 +26,12 @@
 
     <div class="viewer__bar">
       <button type="button" class="btn btn--small" id="toggle">一時停止</button>
-      <a class="btn btn--primary btn--small" id="clip" href="{% url 'clips:create' camera.pk %}">
-        この場面をクリップ保存
+      <a class="btn btn--primary btn--small" id="screenshot" href="{% url 'clips:screenshot' camera.pk %}">
+        スクリーンショット
       </a>
     </div>
     <p class="viewer__note" id="hint">
-      気になる場面で一時停止すると、その瞬間をクリップとして保存できます。
+      気になる場面で一時停止すると、その1コマをスクリーンショットとして保存できます。
     </p>
   </section>
 

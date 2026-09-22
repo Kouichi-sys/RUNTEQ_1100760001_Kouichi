@@ -126,7 +126,8 @@ MVPでは、優先度を以下のように整理して段階的に実装する�
 
 - ユーザー登録・認証(email + passwordによる登録・ログイン)
 - ライブ映像の閲覧(Webブラウザ)
-- 映像のクリップ・ブックマーク保存
+- スクリーンショット保存(表示中の1コマ)
+- 映像のクリップ保存(開始・終了を指定して切り取る動画)
 - ユーザーごとのデータ保存(マイページ)
 - 画像の一覧表示(静止画。通信帯域を圧迫しないための工夫)
 
@@ -258,7 +259,8 @@ Figma: https://www.figma.com/design/kUL6xCOQTMHiCW7QiMIeI3/%E7%94%BB%E9%9D%A2%E9
 - [x] ログアウト機能
 - [x] ライブ映像閲覧機能
 - [ ] 画像一覧表示機能(静止画・通信帯域への配慮)
-- [x] 映像のクリップ・ブックマーク保存機能
+- [x] スクリーンショット保存機能(表示中の1コマを画像として保存)
+- [ ] 映像のクリップ保存機能(開始・終了を指定して動画を切り取り)
 - [ ] マイページ機能(保存済みクリップ一覧)
 - [ ] クリップ詳細閲覧機能
 - [ ] クリップ編集機能
@@ -322,7 +324,8 @@ https://gyazo.com/234fb99846ab84d78ea06684c624a42e
 - camera_id : bigint(FK) / 取得元のカメラ(camerasを参照)
 - title : string / クリップのタイトル
 - file : string / 保存した画像・動画の実ファイル(パス)
-- media_type : string / 種別('image' または 'video')
+- media_type : string / 種別('image' = スクリーンショット / 'video' = クリップ)
+- seconds : integer / クリップ(動画)の長さ(秒)。スクリーンショットは0
 - taken_at : datetime / 映像取得日時
 - memo : text / メモ・報告内容
 
@@ -369,6 +372,6 @@ docker compose exec web python manage.py create_demo_cameras
 | `/home/` | ダッシュボード(カメラ列=サーバーの選択) | 必須 |
 | `/servers/<id>/` | 選択したカメラ列のカメラ一覧 | 必須 |
 | `/cameras/<id>/` | カメラ1台のライブ映像 | 必須 |
-| `/cameras/<id>/clip/` | クリップの保存 | 必須 |
+| `/cameras/<id>/screenshot/` | スクリーンショットの保存 | 必須 |
 | `/logout/` | ログアウト | 必須 |
 | `/admin/` | Django管理画面 | 必須(管理者) |

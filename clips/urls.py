@@ -6,8 +6,8 @@ app_name = "clips"
 
 urlpatterns = [
     path(
-        "cameras/<int:camera_pk>/clip/",
-        views.ClipCreateView.as_view(),
-        name="create",
+        "cameras/<int:camera_pk>/screenshot/",
+        views.ScreenshotCreateView.as_view(),
+        name="screenshot",
     ),
 ]
