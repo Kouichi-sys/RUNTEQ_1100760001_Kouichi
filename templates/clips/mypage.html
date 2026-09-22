@@ -21,7 +21,7 @@
 {% if clips %}
   <section class="features">
     {% for clip in clips %}
-      <article class="card card--camera">
+      <a class="card card--link card--camera" href="{% url 'clips:detail' clip.pk %}">
         <img class="thumb" src="{% url 'clips:file' clip.pk %}" alt="{{ clip.title }}">
         <h2 class="card__title">{{ clip.title }}</h2>
         <p class="card__text">
@@ -36,7 +36,7 @@
         {% if clip.memo %}
           <p class="card__memo">{{ clip.memo|truncatechars:60 }}</p>
         {% endif %}
-      </article>
+      </a>
     {% endfor %}
   </section>
 

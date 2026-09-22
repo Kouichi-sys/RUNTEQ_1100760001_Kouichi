@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}NxWitnessViewer | {{ clip.title }}{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <p class="breadcrumb">
+    <a href="{% url 'pages:home' %}">ダッシュボード</a> /
+    <a href="{% url 'clips:mypage' %}">マイページ</a> /
+    {{ clip.title }}
+  </p>
+  <h1 class="page-head__title">{{ clip.title }}</h1>
+  <p class="page-head__lead">
+    {% if clip.is_video %}
+      クリップ({{ clip.seconds }}秒)
+    {% else %}
+      スクリーンショット
+    {% endif %}
+    / {{ clip.camera.server.name }} / {{ clip.camera.name }}
+  </p>
+</section>
+
+<section class="detail">
+  <div class="detail__media">
+    <img class="viewer__image" src="{% url 'clips:file' clip.pk %}" alt="{{ clip.title }}">
+    {% if clip.is_video %}
+      <p class="viewer__note">保存した{{ clip.seconds }}秒ぶんの映像です。</p>
+    {% else %}
+      <p class="viewer__note">保存した時点の1コマです。</p>
+    {% endif %}
+  </div>
+
+  <div class="detail__panel">
+    <dl class="clip-range">
+      <div class="clip-range__row">
+        <dt>種別</dt>
+        <dd>{% if clip.is_video %}クリップ(動画){% else %}スクリーンショット{% endif %}</dd>
+      </div>
+      <div class="clip-range__row">
+        <dt>ライン</dt><dd>{{ clip.camera.server.line }}</dd>
+      </div>
+      <div class="clip-range__row">
+        <dt>カメラ列</dt><dd>{{ clip.camera.server.name }}</dd>
+      </div>
+      <div class="clip-range__row">
+        <dt>カメラ</dt><dd>{{ clip.camera.name }}</dd>
+      </div>
+      <div class="clip-range__row">
+        <dt>{% if clip.is_video %}開始日時{% else %}日時{% endif %}</dt>
+        <dd>{{ clip.taken_at|date:"Y年n月j日(D) H:i:s" }}</dd>
+      </div>
+      {% if clip.is_video %}
+        <div class="clip-range__row">
+          <dt>長さ</dt><dd>{{ clip.seconds }} 秒</dd>
+        </div>
+      {% endif %}
+    </dl>
+
+    <div class="detail__memo">
+      <h2 class="detail__memo-title">メモ</h2>
+      {% if clip.memo %}
+        <p class="detail__memo-body">{{ clip.memo|linebreaksbr }}</p>
+      {% else %}
+        <p class="detail__memo-body detail__memo-body--empty">メモはありません。</p>
+      {% endif %}
+    </div>
+
+    <div class="detail__actions">
+      <a class="btn btn--small" href="{% url 'cameras:camera_live' clip.camera.pk %}">このカメラを見る</a>
+      <a class="btn btn--small" href="{% url 'clips:mypage' %}">マイページに戻る</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

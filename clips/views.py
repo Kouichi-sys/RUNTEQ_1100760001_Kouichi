@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.views import View
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, DetailView, ListView
 
 from cameras.models import Camera
 from cameras.video_sources import get_video_source
@@ -223,3 +223,19 @@ class ClipFileView(LoginRequiredMixin, View):
 
         content_type = "image/svg+xml" if clip.file.name.endswith(".svg") else None
         return FileResponse(clip.file.open("rb"), content_type=content_type)
+
+
+class ClipDetailView(LoginRequiredMixin, DetailView):
+    """保存した1件の詳細。映像・メモ・撮影元を確認できる。
+
+    保存した本人だけが開ける。他人のものは存在ごと隠す(404)。
+    """
+
+    model = Clip
+    template_name = "clips/clip_detail.html"
+    context_object_name = "clip"
+
+    def get_queryset(self):
+        return Clip.objects.filter(user=self.request.user).select_related(
+            "camera", "camera__server"
+        )
