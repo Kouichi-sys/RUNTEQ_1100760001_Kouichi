@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -23,25 +25,89 @@ class ServerDetailView(LoginRequiredMixin, DetailView):
         return Server.objects.prefetch_related("cameras")
 
 
-class CameraLiveView(LoginRequiredMixin, DetailView):
-    """カメラ1台のライブ映像。"""
+class CameraViewerMixin:
+    """映像を再生する画面の共通処理。ライブと過去映像で同じ仕組みを使う。"""
 
     model = Camera
-    template_name = "cameras/camera_live.html"
     context_object_name = "camera"
 
     def get_queryset(self):
         return Camera.objects.select_related("server")
 
+    def viewer_context(self, start_at):
+        """指定した時刻から再生する映像をコンテキストに詰める。"""
+        source = get_video_source()
+        context = {"source_available": source.is_available()}
+        if context["source_available"]:
+            context["stream_markup"] = source.stream_markup(self.object, start_at)
+            # 映像に重ねて出す時計の開始時刻。一時停止した位置の特定にも使う
+            context["started_at"] = start_at.isoformat()
+        return context
+
+
+class CameraLiveView(CameraViewerMixin, LoginRequiredMixin, DetailView):
+    """カメラ1台のライブ映像。"""
+
+    template_name = "cameras/camera_live.html"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        source = get_video_source()
-        context["source_available"] = source.is_available()
-        if context["source_available"]:
-            now = timezone.localtime()
-            context["stream_markup"] = source.stream_markup(self.object, now)
-            # 映像に重ねて出す時計の開始時刻。一時停止した位置の特定にも使う
-            context["started_at"] = now.isoformat()
+        context.update(self.viewer_context(timezone.localtime()))
+        return context
+
+
+class PlaybackView(CameraViewerMixin, LoginRequiredMixin, DetailView):
+    """過去映像の再生。日時を指定してその時点から再生する。
+
+    実機(VIDEO_SOURCE=nx)では、再生できる範囲はNxWitness側の録画保持期間に
+    依存する。mockでは過去のどの時刻でも再生できる。
+    """
+
+    template_name = "cameras/playback.html"
+    # 日時を指定しなかったときに、どれだけ遡るか
+    DEFAULT_MINUTES_AGO = 60
+    INPUT_FORMAT = "%Y-%m-%dT%H:%M"
+    SHORTCUTS = [
+        (10, "10分前"),
+        (60, "1時間前"),
+        (180, "3時間前"),
+        (1440, "24時間前"),
+    ]
+
+    def parse_start_at(self, now):
+        """入力された日時を読む。未来や読めない値は既定値に戻す。"""
+        raw = self.request.GET.get("at", "").strip()
+        if not raw:
+            return now - timedelta(minutes=self.DEFAULT_MINUTES_AGO), None
+
+        try:
+            parsed = timezone.make_aware(datetime.strptime(raw, self.INPUT_FORMAT))
+        except ValueError:
+            return (
+                now - timedelta(minutes=self.DEFAULT_MINUTES_AGO),
+                "日時を読み取れませんでした。既定の1時間前から再生します。",
+            )
+
+        if parsed > now:
+            return now, "未来の日時は指定できません。現在の映像を表示します。"
+        return parsed, None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = timezone.localtime()
+        start_at, error = self.parse_start_at(now)
+
+        context.update(self.viewer_context(start_at))
+        context["error"] = error
+        context["form_value"] = start_at.strftime(self.INPUT_FORMAT)
+        context["max_value"] = now.strftime(self.INPUT_FORMAT)
+        context["shortcuts"] = [
+            {
+                "label": label,
+                "value": (now - timedelta(minutes=minutes)).strftime(self.INPUT_FORMAT),
+            }
+            for minutes, label in self.SHORTCUTS
+        ]
         return context
 
 

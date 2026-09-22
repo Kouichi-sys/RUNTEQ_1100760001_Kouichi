@@ -265,8 +265,8 @@ Figma: https://www.figma.com/design/kUL6xCOQTMHiCW7QiMIeI3/%E7%94%BB%E9%9D%A2%E9
 - [ ] クリップ詳細閲覧機能
 - [ ] クリップ編集機能
 - [ ] クリップ削除機能
-- [ ] 過去映像検索機能
-- [ ] 過去映像再生機能
+- [x] 過去映像検索機能(日時を指定して再生位置を決める)
+- [x] 過去映像再生機能
 - [ ] 過去映像の巻き戻し・早送り機能
 - [ ] カメラ列(サーバー)切り替え機能
 
@@ -372,6 +372,7 @@ docker compose exec web python manage.py create_demo_cameras
 | `/home/` | ダッシュボード(カメラ列=サーバーの選択) | 必須 |
 | `/servers/<id>/` | 選択したカメラ列のカメラ一覧 | 必須 |
 | `/cameras/<id>/` | カメラ1台のライブ映像 | 必須 |
+| `/cameras/<id>/playback/` | 過去映像の再生(日時指定) | 必須 |
 | `/cameras/<id>/screenshot/` | スクリーンショットの保存 | 必須 |
 | `/logout/` | ログアウト | 必須 |
 | `/admin/` | Django管理画面 | 必須(管理者) |
