@@ -1,11 +1,20 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
+from django.db.models import Count
+from django.views.generic import ListView
+
+from cameras.models import Server
 
 
-class HomeView(LoginRequiredMixin, TemplateView):
-    """ログイン後のホーム。各機能への入り口をまとめる。
+class DashboardView(LoginRequiredMixin, ListView):
+    """ログイン後のダッシュボード。カメラ列(サーバー)を選ぶ入り口。
 
-    カメラ列の選択を含むダッシュボードは Issue #9 でここを置き換える。
+    複数アプリの情報を集約する画面のため、pagesアプリに置いている。
     """
 
+    model = Server
     template_name = "home.html"
+    context_object_name = "servers"
+
+    def get_queryset(self):
+        # カメラ台数をSQL側で数え、テンプレートでのN+1を避ける
+        return Server.objects.annotate(camera_count=Count("cameras"))
