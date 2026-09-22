@@ -89,3 +89,7 @@ class Clip(models.Model):
     def png_name(self):
         """PNGとして配るときのファイル名。"""
         return f"{self.download_name.rsplit('.', 1)[0]}.png"
+
+    def movie_name(self, extension):
+        """動画として配るときのファイル名。"""
+        return f"{self.download_name.rsplit('.', 1)[0]}.{extension}"
