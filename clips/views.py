@@ -4,12 +4,13 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import ContentFile
-from django.http import HttpResponseRedirect
+from django.http import FileResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.views.generic import CreateView
+from django.views import View
+from django.views.generic import CreateView, ListView
 
 from cameras.models import Camera
 from cameras.video_sources import get_video_source
@@ -174,3 +175,51 @@ class ClipCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         # マイページ(#15)ができるまでは、元の過去映像画面に戻す
         return reverse("cameras:playback", args=[self.camera.pk])
+
+
+class MyPageView(LoginRequiredMixin, ListView):
+    """自分が保存したクリップとスクリーンショットの一覧。
+
+    保存したデータは本人だけが見られる(README 7章の方針)。
+    """
+
+    model = Clip
+    template_name = "clips/mypage.html"
+    context_object_name = "clips"
+    paginate_by = 12
+
+    def get_queryset(self):
+        # 他人のクリップは一切出さない
+        queryset = Clip.objects.filter(user=self.request.user).select_related(
+            "camera", "camera__server"
+        )
+        media_type = self.request.GET.get("type")
+        if media_type in (Clip.IMAGE, Clip.VIDEO):
+            queryset = queryset.filter(media_type=media_type)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        mine = Clip.objects.filter(user=self.request.user)
+        context["selected_type"] = self.request.GET.get("type", "")
+        context["total_count"] = mine.count()
+        context["image_count"] = mine.filter(media_type=Clip.IMAGE).count()
+        context["video_count"] = mine.filter(media_type=Clip.VIDEO).count()
+        return context
+
+
+class ClipFileView(LoginRequiredMixin, View):
+    """保存したファイルを返す。
+
+    MEDIA_ROOTを直接公開すると、URLを知っていれば誰でも見られてしまう。
+    保存した本人かどうかを確かめてから返す。
+    社内NASに置いた場合も同じ経路で配信できる。
+    """
+
+    def get(self, request, pk):
+        clip = get_object_or_404(Clip, pk=pk, user=request.user)
+        if not clip.file or not clip.file.storage.exists(clip.file.name):
+            raise Http404("ファイルが見つかりません。")
+
+        content_type = "image/svg+xml" if clip.file.name.endswith(".svg") else None
+        return FileResponse(clip.file.open("rb"), content_type=content_type)

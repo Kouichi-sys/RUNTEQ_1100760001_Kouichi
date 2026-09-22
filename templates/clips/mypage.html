@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}NxWitnessViewer | マイページ{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1 class="page-head__title">マイページ</h1>
+  <p class="page-head__lead">{{ user.name }} さんが保存した映像です。自分が保存したものだけが表示されます。</p>
+</section>
+
+<section class="filters">
+  <a class="btn btn--small {% if not selected_type %}btn--active{% endif %}"
+     href="{% url 'clips:mypage' %}">すべて({{ total_count }})</a>
+  <a class="btn btn--small {% if selected_type == 'video' %}btn--active{% endif %}"
+     href="?type=video">クリップ({{ video_count }})</a>
+  <a class="btn btn--small {% if selected_type == 'image' %}btn--active{% endif %}"
+     href="?type=image">スクリーンショット({{ image_count }})</a>
+</section>
+
+{% if clips %}
+  <section class="features">
+    {% for clip in clips %}
+      <article class="card card--camera">
+        <img class="thumb" src="{% url 'clips:file' clip.pk %}" alt="{{ clip.title }}">
+        <h2 class="card__title">{{ clip.title }}</h2>
+        <p class="card__text">
+          {{ clip.camera.server.name }} / {{ clip.camera.name }}<br>
+          {{ clip.taken_at|date:"Y年n月j日(D) H:i:s" }}
+        </p>
+        {% if clip.is_video %}
+          <span class="card__status card__status--video">クリップ {{ clip.seconds }}秒</span>
+        {% else %}
+          <span class="card__status">スクリーンショット</span>
+        {% endif %}
+        {% if clip.memo %}
+          <p class="card__memo">{{ clip.memo|truncatechars:60 }}</p>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </section>
+
+  {% if is_paginated %}
+    <nav class="pagination">
+      {% if page_obj.has_previous %}
+        <a class="btn btn--small" href="?{% if selected_type %}type={{ selected_type }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">前へ</a>
+      {% endif %}
+      <span class="pagination__status">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a class="btn btn--small" href="?{% if selected_type %}type={{ selected_type }}&amp;{% endif %}page={{ page_obj.next_page_number }}">次へ</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+{% else %}
+  <section class="empty">
+    <p class="empty__text">
+      {% if selected_type %}この種類の保存はまだありません。{% else %}まだ何も保存していません。{% endif %}
+    </p>
+    <p class="empty__note">
+      <a href="{% url 'pages:home' %}">ダッシュボード</a>からカメラを選び、
+      気になる場面をスクリーンショットやクリップとして保存できます。
+    </p>
+  </section>
+{% endif %}
+{% endblock %}
