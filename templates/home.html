@@ -1,47 +1,32 @@
 {% extends "base.html" %}
 
-{% block title %}NxWitnessViewer | ホーム{% endblock %}
+{% block title %}NxWitnessViewer | ダッシュボード{% endblock %}
 
 {% block content %}
 <section class="page-head">
-  <h1 class="page-head__title">ホーム</h1>
-  <p class="page-head__lead">確認したい内容を選んでください。</p>
+  <h1 class="page-head__title">ダッシュボード</h1>
+  <p class="page-head__lead">確認したいカメラ列(サーバー)を選んでください。</p>
 </section>
 
-<section class="features">
-  <div class="card">
-    <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <rect x="2" y="6" width="14" height="12" rx="2"/>
-      <path d="M16 10l6-3v10l-6-3"/>
-    </svg>
-    <h2 class="card__title">ライブ映像の確認</h2>
-    <p class="card__text">
-      今の現場の様子をブラウザから確認できます。通信量を抑えるため、静止画ベースで表示します。
-    </p>
-    <span class="card__status">準備中</span>
-  </div>
-
-  <div class="card">
-    <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <circle cx="12" cy="12" r="9"/>
-      <path d="M12 7v5l3 2"/>
-    </svg>
-    <h2 class="card__title">過去映像の検索・再生</h2>
-    <p class="card__text">
-      日時とカメラを指定して、過去の録画をさかのぼって確認できます。巻き戻し・早送りにも対応します。
-    </p>
-    <span class="card__status">準備中</span>
-  </div>
-
-  <div class="card">
-    <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path d="M5 3h14v18l-7-5-7 5V3z"/>
-    </svg>
-    <h2 class="card__title">クリップの保存</h2>
-    <p class="card__text">
-      トラブル時の映像をその場でクリップとして保存。メモを添えてマイページで管理できます。
-    </p>
-    <span class="card__status">準備中</span>
-  </div>
-</section>
+{% if servers %}
+  <section class="features">
+    {% for server in servers %}
+      <a class="card card--link" href="{% url 'cameras:server_detail' server.pk %}">
+        <svg class="card__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="7" rx="2"/>
+          <rect x="3" y="13" width="18" height="7" rx="2"/>
+          <path d="M7 7.5h.01M7 16.5h.01"/>
+        </svg>
+        <h2 class="card__title">{{ server.name }}</h2>
+        <p class="card__text">{{ server.line }}</p>
+        <span class="card__status">カメラ {{ server.camera_count }} 台</span>
+      </a>
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="empty">
+    <p class="empty__text">カメラ列(サーバー)がまだ登録されていません。</p>
+    <p class="empty__note">管理画面から登録してください。</p>
+  </section>
+{% endif %}
 {% endblock %}

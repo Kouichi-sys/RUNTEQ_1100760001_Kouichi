@@ -252,8 +252,8 @@ Figma: https://www.figma.com/design/kUL6xCOQTMHiCW7QiMIeI3/%E7%94%BB%E9%9D%A2%E9
 社内Wi-Fiを利用したローカル環境で運用し、データを社外に出さない設計とすることで、セキュリティ面の懸念にも配慮しています。
 
 ### READMEに記載した機能
-- [ ] ユーザー認証機能(社内アカウントによるログイン)
-- [ ] ログアウト機能
+- [x] ユーザー認証機能(社内アカウントによるログイン)
+- [x] ログアウト機能
 - [ ] ライブ映像閲覧機能
 - [ ] 画像一覧表示機能(静止画・通信帯域への配慮)
 - [ ] 映像のクリップ・ブックマーク保存機能
@@ -349,6 +349,9 @@ docker compose exec web python manage.py migrate
 
 # 4. ログイン用のアカウントを作成する
 docker compose exec web python manage.py createsuperuser
+
+# 5. 動作確認用のサーバー・カメラを登録する(任意)
+docker compose exec web python manage.py create_demo_cameras
 ```
 
 起動後、`http://localhost:8000/` にアクセスするとログイン画面が表示されます。
@@ -358,6 +361,7 @@ docker compose exec web python manage.py createsuperuser
 | URL | 画面 | ログイン |
 | --- | --- | --- |
 | `/` | ログイン画面(トップページ) | 不要 |
-| `/home/` | ログイン後のホーム | 必須 |
+| `/home/` | ダッシュボード(カメラ列=サーバーの選択) | 必須 |
+| `/servers/<id>/` | 選択したカメラ列のカメラ一覧 | 必須 |
 | `/logout/` | ログアウト | 必須 |
 | `/admin/` | Django管理画面 | 必須(管理者) |
