@@ -15,7 +15,13 @@ def clip_upload_path(instance, filename):
 
 
 class Clip(models.Model):
-    """ユーザーが保存した映像。実ファイルはMEDIA_ROOT配下に置き、DBにはパスだけ持つ。"""
+    """ユーザーが保存した映像。実ファイルはMEDIA_ROOT配下に置き、DBにはパスだけ持つ。
+
+    2種類を同じテーブルで持つ(media_typeで区別する)。
+
+    - image … スクリーンショット。ある瞬間の1コマ
+    - video … クリップ。開始から終了までを切り取った動画
+    """
 
     IMAGE = "image"
     VIDEO = "video"
@@ -42,6 +48,8 @@ class Clip(models.Model):
         "種別", max_length=10, choices=MEDIA_TYPE_CHOICES, default=IMAGE
     )
     taken_at = models.DateTimeField("映像取得日時")
+    # クリップ(動画)の長さ。スクリーンショットは0
+    seconds = models.PositiveIntegerField("長さ(秒)", default=0)
     memo = models.TextField("メモ", blank=True)
 
     class Meta:
@@ -54,3 +62,7 @@ class Clip(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def is_video(self):
+        return self.media_type == self.VIDEO

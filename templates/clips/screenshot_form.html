@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}NxWitnessViewer | クリップの保存{% endblock %}
+{% block title %}NxWitnessViewer | スクリーンショットの保存{% endblock %}
 
 {% block content %}
 <section class="page-head">
@@ -8,10 +8,10 @@
     <a href="{% url 'pages:home' %}">ダッシュボード</a> /
     <a href="{% url 'cameras:server_detail' camera.server.pk %}">{{ camera.server.name }}</a> /
     <a href="{% url 'cameras:camera_live' camera.pk %}">{{ camera.name }}</a> /
-    クリップの保存
+    スクリーンショットの保存
   </p>
-  <h1 class="page-head__title">クリップの保存</h1>
-  <p class="page-head__lead">保存ボタンを押した時点の映像を切り出して保存します。</p>
+  <h1 class="page-head__title">スクリーンショットの保存</h1>
+  <p class="page-head__lead">表示している時点の1コマを画像として保存します。</p>
 </section>
 
 <section class="clip-form">
@@ -35,7 +35,7 @@
       </div>
     {% endfor %}
 
-    <button type="submit" class="btn btn--primary btn--block">この映像を保存する</button>
+    <button type="submit" class="btn btn--primary btn--block">この1コマを保存する</button>
     <p class="form-panel__note">
       <a href="{% url 'cameras:camera_live' camera.pk %}">保存せずに戻る</a>
     </p>

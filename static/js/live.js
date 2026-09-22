@@ -6,14 +6,14 @@
   const toggle = document.getElementById("toggle");
   const clock = document.getElementById("clock");
   const badge = document.getElementById("badge");
-  const clip = document.getElementById("clip");
+  const shot = document.getElementById("screenshot");
   if (!stage || !toggle) {
     return;
   }
 
   const startedAt = new Date(stage.dataset.startedAt);
   const startedTick = performance.now();
-  const clipBaseUrl = clip.getAttribute("href");
+  const shotBaseUrl = shot.getAttribute("href");
   let paused = false;
   // 一時停止した時刻。再生中はnull
   let pausedAt = null;
@@ -49,7 +49,7 @@
     badge.classList.add("viewer__badge--paused");
     clock.textContent = format(pausedAt);
     // 止めた瞬間をそのまま保存できるように、時刻を渡す
-    clip.setAttribute("href", clipBaseUrl + "?at=" + encodeURIComponent(pausedAt.toISOString()));
+    shot.setAttribute("href", shotBaseUrl + "?at=" + encodeURIComponent(pausedAt.toISOString()));
   }
 
   function play() {
@@ -59,7 +59,7 @@
     toggle.textContent = "一時停止";
     badge.textContent = "● LIVE";
     badge.classList.remove("viewer__badge--paused");
-    clip.setAttribute("href", clipBaseUrl);
+    shot.setAttribute("href", shotBaseUrl);
     requestAnimationFrame(tick);
   }
 
