@@ -4,6 +4,7 @@
 
 {% block content %}
 <section class="page-head">
+  <p class="breadcrumb"><a href="{% url 'pages:home' %}">ダッシュボード</a> / マイページ</p>
   <h1 class="page-head__title">マイページ</h1>
   <p class="page-head__lead">{{ user.name }} さんが保存した映像です。自分が保存したものだけが表示されます。</p>
 </section>
@@ -56,8 +57,10 @@
       {% if selected_type %}この種類の保存はまだありません。{% else %}まだ何も保存していません。{% endif %}
     </p>
     <p class="empty__note">
-      <a href="{% url 'pages:home' %}">ダッシュボード</a>からカメラを選び、
-      気になる場面をスクリーンショットやクリップとして保存できます。
+      カメラを選んで、気になる場面をスクリーンショットやクリップとして保存できます。
+    </p>
+    <p class="empty__action">
+      <a class="btn btn--primary btn--small" href="{% url 'pages:home' %}">ダッシュボードへ</a>
     </p>
   </section>
 {% endif %}

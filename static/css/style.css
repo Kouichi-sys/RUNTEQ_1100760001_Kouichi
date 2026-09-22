@@ -63,6 +63,7 @@ a {
 }
 
 .header__nav {
+  flex-wrap: wrap;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -696,4 +697,16 @@ input[type="time"] {
 
 .header__link:hover {
   color: var(--accent);
+}
+
+/* いま開いている画面が分かるようにする */
+.header__link--current {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 2px;
+}
+
+
+.empty__action {
+  margin: 16px 0 0;
 }
