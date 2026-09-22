@@ -68,12 +68,13 @@
     <div class="range">
       <span class="range__label">クリップの範囲</span>
       <button type="button" class="btn btn--small" data-mark="start">開始をセット</button>
-      <button type="button" class="btn btn--small" data-mark="end">終了をセット</button>
-      <span class="range__status range__status--empty" id="range-status">未指定</span>
+      <button type="button" class="btn btn--small" data-mark="end" disabled>終了をセット</button>
+      <span class="range__status range__status--empty" id="range-status">始まりの場面で「開始をセット」</span>
       <a class="btn btn--primary btn--small btn--disabled" id="clip"
          data-url="{% url 'clips:clip' camera.pk %}">クリップを保存</a>
       <button type="button" class="btn btn--small" data-mark="clear">クリア</button>
     </div>
+    <p class="range__note" id="range-note"></p>
 
     <div class="range">
       <span class="range__label">よく使う範囲</span>

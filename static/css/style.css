@@ -624,3 +624,16 @@ input[type="time"] {
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.range__note {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--danger);
+  min-height: 18px;
+}
