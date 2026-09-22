@@ -58,6 +58,15 @@ class VideoSource(ABC):
         動画を取得することを想定している。
         """
 
+    @abstractmethod
+    def export_movie(self, camera, start_at):
+        """メールで共有できる形式の動画を返す。(bytes, 拡張子)
+
+        mockの保存形式(SVG)は受け取った人が開きにくいため、
+        渡すときだけ扱いやすい形に変換する。実機は保存したmp4を
+        そのまま渡すので、この変換は使わない。
+        """
+
 
 class MockVideoSource(VideoSource):
     """アプリ側で生成した疑似映像を返す。
@@ -89,6 +98,11 @@ class MockVideoSource(VideoSource):
         # 開始時点から動き続ける映像を保存する。長さはClip.secondsで持つ
         svg = render_stream(camera, start_at, self.product_shape(camera))
         return svg.encode("utf-8"), "svg", "video"
+
+    def export_movie(self, camera, start_at):
+        from .mock_movie import render_gif
+
+        return render_gif(camera, start_at, self.product_shape(camera)), "gif"
 
     def product_shape(self, camera):
         """カメラが属するラインから、流れる製品の形を決める。"""
@@ -129,6 +143,10 @@ class NxVideoSource(VideoSource):
         raise NotImplementedError(
             "NxWitness APIからの区間切り出しは未実装です(Issue #25の疎通確認後に対応)。"
         )
+
+    def export_movie(self, camera, start_at):
+        # 実機は保存したmp4をそのまま渡せるため、変換は不要
+        raise NotImplementedError("実機のクリップは保存した動画をそのまま渡します。")
 
 
 def get_video_source():

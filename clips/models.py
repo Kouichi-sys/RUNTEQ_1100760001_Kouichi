@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.text import get_valid_filename
 
 
 def clip_upload_path(instance, filename):
@@ -66,3 +67,29 @@ class Clip(models.Model):
     @property
     def is_video(self):
         return self.media_type == self.VIDEO
+
+    @property
+    def download_name(self):
+        """PCに保存したときに中身が分かるファイル名。
+
+        報告書に添付することを想定し、タイトル・カメラ・日時を並べる。
+        """
+        taken = timezone.localtime(self.taken_at)
+        extension = self.file.name.rsplit(".", 1)[-1]
+        base = "_".join([
+            self.title,
+            self.camera.server.name,
+            self.camera.name,
+            taken.strftime("%Y%m%d_%H%M%S"),
+        ])
+        # ファイル名に使えない文字を落とし、長くなりすぎないようにする
+        return f"{get_valid_filename(base)[:100]}.{extension}"
+
+    @property
+    def png_name(self):
+        """PNGとして配るときのファイル名。"""
+        return f"{self.download_name.rsplit('.', 1)[0]}.png"
+
+    def movie_name(self, extension):
+        """動画として配るときのファイル名。"""
+        return f"{self.download_name.rsplit('.', 1)[0]}.{extension}"

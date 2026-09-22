@@ -1,6 +1,6 @@
 import re
 from datetime import timedelta
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -268,4 +268,39 @@ class ClipThumbnailView(LoginRequiredMixin, View):
             svg = stored.read().decode("utf-8")
         return HttpResponse(
             self.STYLE_PATTERN.sub("", svg), content_type="image/svg+xml"
+        )
+
+
+class ClipDownloadView(LoginRequiredMixin, View):
+    """保存したファイルをPCにダウンロードさせる。
+
+    閲覧用(ClipFileView)と同じく、保存した本人だけが取得できる。
+    報告書に添付できるよう、中身が分かるファイル名を付ける。
+    """
+
+    def get(self, request, pk):
+        clip = get_object_or_404(
+            Clip.objects.select_related("camera", "camera__server"),
+            pk=pk,
+            user=request.user,
+        )
+        if not clip.file or not clip.file.storage.exists(clip.file.name):
+            raise Http404("ファイルが見つかりません。")
+
+        # mockの保存形式(SVG)はメールで配りにくいため、動くGIFに直して渡す。
+        # 実機のクリップ(mp4)は変換せずそのまま渡す。
+        if clip.is_video and clip.file.name.endswith(".svg"):
+            content, extension = get_video_source().export_movie(
+                clip.camera, timezone.localtime(clip.taken_at)
+            )
+            response = HttpResponse(content, content_type="image/gif")
+            response["Content-Disposition"] = (
+                f"attachment; filename*=UTF-8''{quote(clip.movie_name(extension))}"
+            )
+            return response
+
+        return FileResponse(
+            clip.file.open("rb"),
+            as_attachment=True,
+            filename=clip.download_name,
         )
