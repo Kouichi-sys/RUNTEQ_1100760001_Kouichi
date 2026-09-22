@@ -519,7 +519,8 @@ a {
   margin-top: 12px;
 }
 
-.viewer__badge--playback {
+/* 一時停止中は停止色を優先する */
+.viewer__badge--playback:not(.viewer__badge--paused) {
   color: #bae6fd;
 }
 

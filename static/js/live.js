@@ -11,6 +11,8 @@
     return;
   }
 
+  // 再生中の表示はライブと過去映像で異なるため、最初の文言をそのまま使う
+  const playingLabel = badge.textContent.trim();
   const startedAt = new Date(stage.dataset.startedAt);
   const startedTick = performance.now();
   const shotBaseUrl = shot.getAttribute("href");
@@ -57,7 +59,7 @@
     pausedAt = null;
     stage.classList.remove("nxv-paused");
     toggle.textContent = "一時停止";
-    badge.textContent = "● LIVE";
+    badge.textContent = playingLabel;
     badge.classList.remove("viewer__badge--paused");
     shot.setAttribute("href", shotBaseUrl);
     requestAnimationFrame(tick);
