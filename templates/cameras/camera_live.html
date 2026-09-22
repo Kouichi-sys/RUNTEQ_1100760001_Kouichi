@@ -20,6 +20,7 @@
     <div class="viewer__bar">
       <span class="viewer__status" id="status">更新中</span>
       <button type="button" class="btn btn--small" id="toggle">一時停止</button>
+      <a class="btn btn--primary btn--small" href="{% url 'clips:create' camera.pk %}">クリップを保存</a>
     </div>
     <p class="viewer__note">
       通信量を抑えるため、動画ではなく静止画を一定間隔で取得しています。
