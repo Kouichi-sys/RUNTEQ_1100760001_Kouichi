@@ -1,3 +1,6 @@
+from datetime import timedelta
+from urllib.parse import urlencode
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import ContentFile
@@ -5,6 +8,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.views.generic import CreateView
 
 from cameras.models import Camera
@@ -31,16 +35,32 @@ class ClipCreateView(LoginRequiredMixin, CreateView):
             Camera.objects.select_related("server"), pk=kwargs["camera_pk"]
         )
 
+    def captured_at(self):
+        """切り出す時刻。動画を一時停止していれば、その瞬間を使う。
+
+        値は画面から送られてくるため、現在時刻から大きく離れていれば無視する。
+        """
+        raw = self.request.GET.get("at")
+        if raw:
+            parsed = parse_datetime(raw)
+            if parsed and abs(timezone.now() - parsed) < timedelta(minutes=10):
+                return parsed
+        return timezone.now()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["camera"] = self.camera
+        captured_at = self.captured_at()
+        context["captured_at"] = timezone.localtime(captured_at)
         source = get_video_source()
         if source.is_available():
-            context["live_image_url"] = source.live_image_url(self.camera)
+            # 保存されるのと同じコマをプレビューに出す
+            query = urlencode({"at": captured_at.isoformat()})
+            context["preview_url"] = f"{source.live_image_url(self.camera)}?{query}"
         return context
 
     def form_valid(self, form):
-        taken_at = timezone.now()
+        taken_at = self.captured_at()
         content, extension, media_type = get_video_source().capture(
             self.camera, timezone.localtime(taken_at)
         )

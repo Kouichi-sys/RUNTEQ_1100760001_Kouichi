@@ -16,11 +16,11 @@
 
 <section class="clip-form">
   <div class="clip-form__preview">
-    <img class="viewer__image" src="{{ live_image_url }}" alt="{{ camera.name }} の映像">
-    <p class="viewer__note">{{ camera.server.name }} / {{ camera.name }}</p>
+    <img class="viewer__image" src="{{ preview_url }}" alt="{{ camera.name }} の映像">
+    <p class="viewer__note">{{ camera.server.name }} / {{ camera.name }} / {{ captured_at|date:"Y-m-d H:i:s" }} 時点</p>
   </div>
 
-  <form class="clip-form__panel" method="post">
+  <form class="clip-form__panel" method="post" action="?{{ request.GET.urlencode }}">
     {% csrf_token %}
 
     {% for field in form %}

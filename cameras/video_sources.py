@@ -35,6 +35,14 @@ class VideoSource(ABC):
         """映像を取得できる状態かどうか。"""
 
     @abstractmethod
+    def stream_markup(self, camera, now):
+        """カメラ個別の画面に埋め込む、動き続ける映像のHTMLを返す。
+
+        mockはCSSアニメーション付きのSVG、実機ではNxWitnessのストリームを
+        再生する <video> を返すことを想定している。
+        """
+
+    @abstractmethod
     def capture(self, camera, now):
         """その時点の映像を切り出す。
 
@@ -55,6 +63,11 @@ class MockVideoSource(VideoSource):
 
     def is_available(self):
         return True
+
+    def stream_markup(self, camera, now):
+        from .mock_frame import render_stream
+
+        return render_stream(camera, now, self.product_shape(camera))
 
     def capture(self, camera, now):
         from .mock_frame import render_frame
@@ -86,6 +99,11 @@ class NxVideoSource(VideoSource):
 
     def is_available(self):
         return bool(settings.NX_BASE_URL)
+
+    def stream_markup(self, camera, now):
+        raise NotImplementedError(
+            "NxWitnessのストリーム再生は未実装です(Issue #25の疎通確認後に対応)。"
+        )
 
     def capture(self, camera, now):
         raise NotImplementedError(
