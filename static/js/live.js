@@ -74,6 +74,7 @@
     document.querySelectorAll("[data-rate]").forEach(function (button) {
       button.classList.toggle("btn--active", Number(button.dataset.rate) === rate);
     });
+    updateRange();
   }
 
   function pause() {
@@ -128,6 +129,10 @@
   // ここから下はクリップの範囲指定。過去映像画面にだけ要素がある
   const clip = document.getElementById("clip");
   const rangeStatus = document.getElementById("range-status");
+  const rangeNote = document.getElementById("range-note");
+  const startButton = document.querySelector('[data-mark="start"]');
+  const endButton = document.querySelector('[data-mark="end"]');
+  const rangeButtons = document.querySelectorAll("[data-mark], [data-around]");
   let clipStart = null;
   let clipEnd = null;
 
@@ -140,47 +145,96 @@
     if (!clip) {
       return;
     }
+
+    // 早送り・スロー再生のまま範囲を決めると、狙った場面とずれやすい。
+    // 等速に戻すまでクリップの操作はできないようにする
+    const equalSpeed = rate === 1;
+    rangeButtons.forEach(function (button) {
+      button.disabled = !equalSpeed;
+    });
+    if (!equalSpeed) {
+      rangeNote.textContent = "範囲を決めるには再生速度を1倍に戻してください。";
+      clip.classList.add("btn--disabled");
+      clip.removeAttribute("href");
+      return;
+    }
+
+    // 開始は決め直せないようにする。やり直すときはクリアを押す
+    if (startButton) {
+      startButton.disabled = Boolean(clipStart);
+    }
+    // 終了は開始を決めてからでないと押せない
+    if (endButton) {
+      endButton.disabled = !clipStart;
+    }
+
     if (clipStart && clipEnd) {
-      // 逆に押されても困らないよう、早い方を開始にする
-      const from = clipStart < clipEnd ? clipStart : clipEnd;
-      const to = clipStart < clipEnd ? clipEnd : clipStart;
-      const seconds = Math.round((to - from) / 1000);
-      rangeStatus.textContent = clockOnly(from) + " 〜 " + clockOnly(to) + " (" + seconds + "秒)";
-      rangeStatus.classList.remove("range__status--empty");
+      const seconds = Math.round((clipEnd - clipStart) / 1000);
+      rangeStatus.textContent =
+        clockOnly(clipStart) + " 〜 " + clockOnly(clipEnd) + " (" + seconds + "秒)";
+      rangeStatus.classList.remove("clip-panel__status--empty");
       clip.classList.remove("btn--disabled");
       clip.setAttribute(
         "href",
         clip.dataset.url +
-          "?start=" + encodeURIComponent(from.toISOString()) +
-          "&end=" + encodeURIComponent(to.toISOString())
+          "?start=" + encodeURIComponent(clipStart.toISOString()) +
+          "&end=" + encodeURIComponent(clipEnd.toISOString())
       );
       return;
     }
 
     if (clipStart) {
-      rangeStatus.textContent = "開始 " + clockOnly(clipStart) + " / 終了は未指定";
-    } else if (clipEnd) {
-      rangeStatus.textContent = "終了 " + clockOnly(clipEnd) + " / 開始は未指定";
+      rangeStatus.textContent =
+        "開始 " + clockOnly(clipStart) + " / 終わりの場面まで進めて「終了をセット」";
     } else {
-      rangeStatus.textContent = "未指定";
+      rangeStatus.textContent = "始まりの場面で「開始をセット」";
     }
-    rangeStatus.classList.add("range__status--empty");
+    rangeStatus.classList.add("clip-panel__status--empty");
     clip.classList.add("btn--disabled");
     clip.removeAttribute("href");
+  }
+
+  function markStart() {
+    clipStart = currentTime();
+    // 開始を決め直したら、それより前の終了は無効にする
+    if (clipEnd && clipEnd <= clipStart) {
+      clipEnd = null;
+    }
+    rangeNote.textContent = "";
+    updateRange();
+  }
+
+  function markEnd() {
+    const at = currentTime();
+    if (!clipStart) {
+      return;
+    }
+    if (at <= clipStart) {
+      rangeNote.textContent = "終了は開始より後の場面にしてください。";
+      return;
+    }
+    clipEnd = at;
+    rangeNote.textContent = "";
+    updateRange();
+  }
+
+  function clearRange() {
+    clipStart = null;
+    clipEnd = null;
+    rangeNote.textContent = "";
+    updateRange();
   }
 
   document.querySelectorAll("[data-mark]").forEach(function (button) {
     button.addEventListener("click", function () {
       const kind = button.dataset.mark;
       if (kind === "start") {
-        clipStart = currentTime();
+        markStart();
       } else if (kind === "end") {
-        clipEnd = currentTime();
+        markEnd();
       } else {
-        clipStart = null;
-        clipEnd = null;
+        clearRange();
       }
-      updateRange();
     });
   });
 
@@ -195,6 +249,7 @@
       }
       clipStart = new Date(center.getTime() - half);
       clipEnd = to;
+      rangeNote.textContent = "";
       updateRange();
     });
   });

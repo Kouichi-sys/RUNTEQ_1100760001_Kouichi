@@ -590,37 +590,64 @@ input[type="time"] {
   margin: 0;
 }
 
-/* ===== 範囲指定の操作 ===== */
-.range {
+/* ===== クリップの切り取り枠 ===== */
+.clip-panel {
+  max-width: 900px;
+  margin: 20px auto 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 20px 12px;
+}
+
+.clip-panel__title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  text-align: center;
+}
+
+.clip-panel__status {
+  margin: 0 0 14px;
+  text-align: center;
+  font-size: 14px;
+  font-family: monospace;
+  color: var(--text);
+}
+
+.clip-panel__status--empty {
+  font-family: inherit;
+  color: var(--text-muted);
+}
+
+.clip-panel__row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
+  margin-bottom: 10px;
 }
 
-.range__label {
+.clip-panel__label {
   font-size: 13px;
   color: var(--text-muted);
 }
 
-.range__status {
-  font-size: 14px;
-  font-family: monospace;
-  color: var(--text);
-  min-width: 260px;
-  text-align: center;
-}
-
-.range__status--empty {
-  color: var(--text-muted);
-  font-family: inherit;
-}
 
 .btn--disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.range__note {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--danger);
+  min-height: 18px;
 }
