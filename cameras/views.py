@@ -2,15 +2,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.views import View
 from django.views.generic import DetailView
 
 from .mock_frame import render_frame
 from .models import Camera, Server
 from .video_sources import MockVideoSource, get_video_source
-
-# ライブ映像(静止画)の更新間隔。短くしすぎると社内LANの帯域を圧迫する
-LIVE_REFRESH_SECONDS = 2
 
 
 class ServerDetailView(LoginRequiredMixin, DetailView):
@@ -40,9 +38,10 @@ class CameraLiveView(LoginRequiredMixin, DetailView):
         source = get_video_source()
         context["source_available"] = source.is_available()
         if context["source_available"]:
-            context["live_image_url"] = source.live_image_url(self.object)
-        # 帯域を抑えるため、動画ではなく静止画をこの間隔で取り直す
-        context["refresh_seconds"] = LIVE_REFRESH_SECONDS
+            now = timezone.localtime()
+            context["stream_markup"] = source.stream_markup(self.object, now)
+            # 映像に重ねて出す時計の開始時刻。一時停止した位置の特定にも使う
+            context["started_at"] = now.isoformat()
         return context
 
 
@@ -59,7 +58,11 @@ class LiveImageView(LoginRequiredMixin, View):
             raise Http404("疑似映像はVIDEO_SOURCE=mockのときだけ利用できます。")
 
         camera = get_object_or_404(Camera.objects.select_related("server"), pk=pk)
-        svg = render_frame(camera, timezone.localtime(), source.product_shape(camera))
+        # 動画を一時停止した位置のコマが欲しい場合はatで指定する
+        at = parse_datetime(request.GET.get("at", "")) or timezone.now()
+        svg = render_frame(
+            camera, timezone.localtime(at), source.product_shape(camera)
+        )
 
         response = HttpResponse(svg, content_type="image/svg+xml")
         # 常に最新のコマを返したいのでキャッシュさせない

@@ -1,53 +1,75 @@
-// ライブ映像の自動更新。
-// 動画ストリームではなく静止画を一定間隔で取り直すことで、通信量を抑える。
+// ライブ映像の再生制御。
+// 映像はCSSアニメーションで動き続けるため、再生・一時停止は
+// 親要素のクラスを切り替えるだけでよく、通信は発生しない。
 (function () {
-  const image = document.getElementById("live");
-  const status = document.getElementById("status");
+  const stage = document.getElementById("stage");
   const toggle = document.getElementById("toggle");
-  if (!image || !toggle) {
+  const clock = document.getElementById("clock");
+  const badge = document.getElementById("badge");
+  const clip = document.getElementById("clip");
+  if (!stage || !toggle) {
     return;
   }
 
-  const seconds = JSON.parse(document.getElementById("refresh-seconds").textContent);
-  const baseUrl = image.getAttribute("src");
-  let timer = null;
+  const startedAt = new Date(stage.dataset.startedAt);
+  const startedTick = performance.now();
+  const clipBaseUrl = clip.getAttribute("href");
+  let paused = false;
+  // 一時停止した時刻。再生中はnull
+  let pausedAt = null;
 
-  function refresh() {
-    // 同じURLだとブラウザのキャッシュが使われることがあるため、時刻を付ける
-    image.src = baseUrl + "?t=" + Date.now();
+  function currentTime() {
+    if (pausedAt) {
+      return pausedAt;
+    }
+    return new Date(startedAt.getTime() + (performance.now() - startedTick));
   }
 
-  function start() {
-    timer = setInterval(refresh, seconds * 1000);
-    status.textContent = "更新中";
+  function format(date) {
+    const p = (n) => String(n).padStart(2, "0");
+    return (
+      date.getFullYear() + "-" + p(date.getMonth() + 1) + "-" + p(date.getDate()) +
+      " " + p(date.getHours()) + ":" + p(date.getMinutes()) + ":" + p(date.getSeconds())
+    );
+  }
+
+  function tick() {
+    clock.textContent = format(currentTime());
+    if (!paused) {
+      requestAnimationFrame(tick);
+    }
+  }
+
+  function pause() {
+    paused = true;
+    pausedAt = currentTime();
+    stage.classList.add("nxv-paused");
+    toggle.textContent = "再生";
+    badge.textContent = "■ 一時停止";
+    badge.classList.add("viewer__badge--paused");
+    clock.textContent = format(pausedAt);
+    // 止めた瞬間をそのまま保存できるように、時刻を渡す
+    clip.setAttribute("href", clipBaseUrl + "?at=" + encodeURIComponent(pausedAt.toISOString()));
+  }
+
+  function play() {
+    paused = false;
+    pausedAt = null;
+    stage.classList.remove("nxv-paused");
     toggle.textContent = "一時停止";
-  }
-
-  function stop() {
-    clearInterval(timer);
-    timer = null;
-    status.textContent = "停止中";
-    toggle.textContent = "再開";
+    badge.textContent = "● LIVE";
+    badge.classList.remove("viewer__badge--paused");
+    clip.setAttribute("href", clipBaseUrl);
+    requestAnimationFrame(tick);
   }
 
   toggle.addEventListener("click", function () {
-    if (timer) {
-      stop();
+    if (paused) {
+      play();
     } else {
-      refresh();
-      start();
+      pause();
     }
   });
 
-  // 別のタブを見ている間は取得を止め、無駄な通信をしない
-  document.addEventListener("visibilitychange", function () {
-    if (document.hidden) {
-      if (timer) stop();
-    } else if (!timer) {
-      refresh();
-      start();
-    }
-  });
-
-  start();
+  tick();
 })();

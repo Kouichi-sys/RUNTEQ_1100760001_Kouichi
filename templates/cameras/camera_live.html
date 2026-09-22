@@ -16,18 +16,25 @@
 
 {% if source_available %}
   <section class="viewer">
-    <img id="live" class="viewer__image" src="{{ live_image_url }}" alt="{{ camera.name }} のライブ映像">
-    <div class="viewer__bar">
-      <span class="viewer__status" id="status">更新中</span>
-      <button type="button" class="btn btn--small" id="toggle">一時停止</button>
-      <a class="btn btn--primary btn--small" href="{% url 'clips:create' camera.pk %}">クリップを保存</a>
+    <div class="viewer__stage" id="stage" data-started-at="{{ started_at }}">
+      {{ stream_markup|safe }}
+      <div class="viewer__hud">
+        <span class="viewer__badge" id="badge">● LIVE</span>
+        <span class="viewer__clock" id="clock"></span>
+      </div>
     </div>
-    <p class="viewer__note">
-      通信量を抑えるため、動画ではなく静止画を一定間隔で取得しています。
+
+    <div class="viewer__bar">
+      <button type="button" class="btn btn--small" id="toggle">一時停止</button>
+      <a class="btn btn--primary btn--small" id="clip" href="{% url 'clips:create' camera.pk %}">
+        この場面をクリップ保存
+      </a>
+    </div>
+    <p class="viewer__note" id="hint">
+      気になる場面で一時停止すると、その瞬間をクリップとして保存できます。
     </p>
   </section>
 
-  {{ refresh_seconds|json_script:"refresh-seconds" }}
   <script src="{% static 'js/live.js' %}"></script>
 {% else %}
   <section class="empty">
