@@ -31,6 +31,9 @@ services:
       # 社内LAN外ではNxWitness APIに到達できないため、サンプル映像で動かす
       - key: VIDEO_SOURCE
         value: mock
+      # レビュー用のサンプル構成(サーバー・カメラ)を投入する
+      - key: CREATE_DEMO_CAMERAS
+        value: "true"
       # レビュー用デモアカウント。パスワードはRenderの画面で設定する
       - key: DEMO_USER_EMAIL
         value: demo@example.com
