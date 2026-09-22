@@ -13,7 +13,7 @@
   <section class="features">
     {% for camera in server.cameras.all %}
       <a class="card card--link card--camera" href="{% url 'cameras:camera_live' camera.pk %}">
-        <img class="thumb" src="{% url 'cameras:live_image' camera.pk %}" alt="{{ camera.name }} の映像">
+        <img class="thumb" src="{% url 'cameras:live_image' camera.pk %}" alt="{{ camera.name }} の映像" loading="lazy">
         <h2 class="card__title">{{ camera.name }}</h2>
       </a>
     {% endfor %}

@@ -22,7 +22,7 @@
   <section class="features">
     {% for clip in clips %}
       <a class="card card--link card--camera" href="{% url 'clips:detail' clip.pk %}">
-        <img class="thumb" src="{% url 'clips:file' clip.pk %}" alt="{{ clip.title }}">
+        <img class="thumb" src="{% url 'clips:thumbnail' clip.pk %}" alt="{{ clip.title }}" loading="lazy">
         <h2 class="card__title">{{ clip.title }}</h2>
         <p class="card__text">
           {{ clip.camera.server.name }} / {{ clip.camera.name }}<br>

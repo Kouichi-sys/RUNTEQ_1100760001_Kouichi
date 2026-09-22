@@ -1,10 +1,11 @@
+import re
 from datetime import timedelta
 from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import ContentFile
-from django.http import FileResponse, Http404, HttpResponseRedirect
+from django.http import FileResponse, Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
@@ -238,4 +239,33 @@ class ClipDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         return Clip.objects.filter(user=self.request.user).select_related(
             "camera", "camera__server"
+        )
+
+
+class ClipThumbnailView(LoginRequiredMixin, View):
+    """一覧に並べるための静止画を返す。
+
+    クリップ(動画)をそのまま一覧に並べると、開いた枚数だけ映像が動き続けて
+    画面が重くなる。一覧では動きを止めた絵を返し、詳細画面でだけ再生する。
+
+    mockの映像はSVGなので、アニメーションの指定を外すだけで静止画になる。
+    実機の動画(mp4など)に切り替えるときは、NxWitnessのサムネイルを使う。
+    """
+
+    # 生成したSVGのアニメーション定義。これを外すと最初のコマで止まる
+    STYLE_PATTERN = re.compile(r"<style>.*?</style>", re.DOTALL)
+
+    def get(self, request, pk):
+        clip = get_object_or_404(Clip, pk=pk, user=request.user)
+        if not clip.file or not clip.file.storage.exists(clip.file.name):
+            raise Http404("ファイルが見つかりません。")
+
+        # 静止画はそのまま返す
+        if not clip.is_video or not clip.file.name.endswith(".svg"):
+            return FileResponse(clip.file.open("rb"), content_type="image/svg+xml")
+
+        with clip.file.open("rb") as stored:
+            svg = stored.read().decode("utf-8")
+        return HttpResponse(
+            self.STYLE_PATTERN.sub("", svg), content_type="image/svg+xml"
         )
