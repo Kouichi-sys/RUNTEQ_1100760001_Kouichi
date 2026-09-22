@@ -53,6 +53,7 @@
     </div>
 
     <div class="viewer__bar">
+      <a class="btn btn--small" href="{% url 'cameras:camera_live' camera.pk %}">● ライブに戻る</a>
       <button type="button" class="btn btn--small" id="toggle">一時停止</button>
       <a class="btn btn--primary btn--small" id="screenshot" href="{% url 'clips:screenshot' camera.pk %}">
         スクリーンショット
