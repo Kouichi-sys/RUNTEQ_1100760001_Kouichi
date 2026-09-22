@@ -13,7 +13,8 @@ class Server(models.Model):
         db_table = "servers"
         verbose_name = "サーバー"
         verbose_name_plural = "サーバー"
-        ordering = ("line", "name")
+        # 現場の並び(缶→瓶→樽など)をそのまま出したいので、登録した順に表示する
+        ordering = ("id",)
 
     def __str__(self):
         return self.name
@@ -34,7 +35,8 @@ class Camera(models.Model):
         db_table = "cameras"
         verbose_name = "カメラ"
         verbose_name_plural = "カメラ"
-        ordering = ("server", "name")
+        # 工程の流れ(充填→巻締→パレタイズ)の順に見せたいので、登録した順に表示する
+        ordering = ("server", "id")
 
     def __str__(self):
         return f"{self.server.name} / {self.name}"
