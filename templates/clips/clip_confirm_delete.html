@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}NxWitnessViewer | {{ clip.title }} の削除{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <p class="breadcrumb">
+    <a href="{% url 'pages:home' %}">ダッシュボード</a> /
+    <a href="{% url 'clips:mypage' %}">マイページ</a> /
+    <a href="{% url 'clips:detail' clip.pk %}">{{ clip.title }}</a> /
+    削除
+  </p>
+  <h1 class="page-head__title">削除の確認</h1>
+  <p class="page-head__lead">削除すると元に戻せません。内容を確かめてください。</p>
+</section>
+
+<section class="clip-form">
+  <div class="clip-form__preview">
+    <img class="viewer__image" src="{% url 'clips:thumbnail' clip.pk %}" alt="{{ clip.title }}">
+    <dl class="clip-range">
+      <div class="clip-range__row">
+        <dt>タイトル</dt><dd>{{ clip.title }}</dd>
+      </div>
+      <div class="clip-range__row">
+        <dt>種別</dt>
+        <dd>{% if clip.is_video %}クリップ({{ clip.seconds }}秒){% else %}スクリーンショット{% endif %}</dd>
+      </div>
+      <div class="clip-range__row">
+        <dt>カメラ</dt><dd>{{ clip.camera.server.name }} / {{ clip.camera.name }}</dd>
+      </div>
+      <div class="clip-range__row">
+        <dt>{% if clip.is_video %}開始日時{% else %}日時{% endif %}</dt>
+        <dd>{{ clip.taken_at|date:"Y年n月j日(D) H:i:s" }}</dd>
+      </div>
+      {% if clip.memo %}
+        <div class="clip-range__row">
+          <dt>メモ</dt><dd>{{ clip.memo|truncatechars:80 }}</dd>
+        </div>
+      {% endif %}
+    </dl>
+  </div>
+
+  <div class="clip-form__panel">
+    <p class="delete-warning">
+      この映像と、保存されているファイルを削除します。<br>
+      削除したものは元に戻せません。
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn--danger btn--block">削除する</button>
+    </form>
+
+    <p class="form-panel__note">
+      <a href="{% url 'clips:detail' clip.pk %}">削除せずに戻る</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

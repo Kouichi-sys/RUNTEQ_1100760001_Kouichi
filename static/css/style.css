@@ -767,3 +767,29 @@ input[type="time"] {
   font-size: 13px;
   color: var(--text-muted);
 }
+
+/* ===== 削除 ===== */
+.btn--danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.btn--danger:hover {
+  background: #dc2626;
+}
+
+.btn--danger-text {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.delete-warning {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.7;
+}
