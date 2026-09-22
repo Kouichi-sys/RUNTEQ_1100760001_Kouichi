@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}NxWitnessViewer | {{ clip.title }}{% endblock %}
 
@@ -66,10 +67,25 @@
     </div>
 
     <div class="detail__actions">
-      <a class="btn btn--primary btn--small" href="{% url 'clips:download' clip.pk %}">ダウンロード</a>
+      <button type="button" class="btn btn--primary btn--small" id="download-png"
+              data-source="{% url 'clips:thumbnail' clip.pk %}"
+              data-filename="{{ clip.png_name }}">PNGでダウンロード</button>
+      <a class="btn btn--small" href="{% url 'clips:download' clip.pk %}">元のファイル</a>
+    </div>
+    <p class="detail__note">
+      {% if clip.is_video %}
+        PNGは開始時点の1コマです。動画として残すには「元のファイル」を使ってください。
+      {% else %}
+        PNGはメールへの添付や報告書への貼り付けに使えます。
+      {% endif %}
+    </p>
+
+    <div class="detail__actions">
       <a class="btn btn--small" href="{% url 'cameras:camera_live' clip.camera.pk %}">このカメラを見る</a>
       <a class="btn btn--small" href="{% url 'clips:mypage' %}">マイページに戻る</a>
     </div>
   </div>
 </section>
+
+<script src="{% static 'js/download.js' %}"></script>
 {% endblock %}

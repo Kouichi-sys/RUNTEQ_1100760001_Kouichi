@@ -84,3 +84,8 @@ class Clip(models.Model):
         ])
         # ファイル名に使えない文字を落とし、長くなりすぎないようにする
         return f"{get_valid_filename(base)[:100]}.{extension}"
+
+    @property
+    def png_name(self):
+        """PNGとして配るときのファイル名。"""
+        return f"{self.download_name.rsplit('.', 1)[0]}.png"

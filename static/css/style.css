@@ -761,3 +761,9 @@ input[type="time"] {
   padding-top: 16px;
   border-top: 1px solid var(--border);
 }
+
+.detail__note {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
