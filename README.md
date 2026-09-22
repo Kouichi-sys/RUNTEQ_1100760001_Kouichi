@@ -265,7 +265,7 @@ Figma: https://www.figma.com/design/kUL6xCOQTMHiCW7QiMIeI3/%E7%94%BB%E9%9D%A2%E9
 - [x] クリップ詳細閲覧機能
 - [x] 保存した映像のダウンロード機能
 - [x] クリップ編集機能
-- [ ] クリップ削除機能
+- [x] クリップ削除機能
 - [x] 過去映像検索機能(日時を指定して再生位置を決める)
 - [x] 過去映像再生機能
 - [x] 過去映像の巻き戻し・早送り機能
@@ -379,6 +379,7 @@ docker compose exec web python manage.py create_demo_cameras
 | `/mypage/` | マイページ(自分の保存一覧) | 必須 |
 | `/clips/<id>/` | 保存した1件の詳細(本人のみ) | 必須 |
 | `/clips/<id>/edit/` | タイトル・メモの編集(本人のみ) | 必須 |
+| `/clips/<id>/delete/` | 削除(本人のみ) | 必須 |
 | `/clips/<id>/file/` | 保存したファイルの取得(本人のみ) | 必須 |
 | `/clips/<id>/download/` | 保存したファイルのダウンロード(本人のみ) | 必須 |
 | `/logout/` | ログアウト | 必須 |

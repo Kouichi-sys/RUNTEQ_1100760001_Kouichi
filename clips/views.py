@@ -7,11 +7,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import ContentFile
 from django.http import FileResponse, Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.views import View
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
 from cameras.models import Camera
 from cameras.video_sources import get_video_source
@@ -331,3 +337,27 @@ class ClipUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse("clips:detail", args=[self.object.pk])
+
+
+class ClipDeleteView(LoginRequiredMixin, DeleteView):
+    """保存したものを削除する。
+
+    取り消せない操作のため、確認画面をはさむ。保存した本人だけが消せる。
+    """
+
+    model = Clip
+    template_name = "clips/clip_confirm_delete.html"
+    success_url = reverse_lazy("clips:mypage")
+
+    def get_queryset(self):
+        return Clip.objects.filter(user=self.request.user).select_related(
+            "camera", "camera__server"
+        )
+
+    def form_valid(self, form):
+        title = self.object.title
+        # DBの行だけ消すと、保存先(NAS)に実ファイルが残ってしまう
+        self.object.file.delete(save=False)
+        response = super().form_valid(form)
+        messages.success(self.request, f"「{title}」を削除しました。")
+        return response
