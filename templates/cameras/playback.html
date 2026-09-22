@@ -18,16 +18,25 @@
 <section class="search">
   <form class="search__form" method="get">
     <div class="field field--inline">
-      <label class="field__label" for="at">再生を開始する日時</label>
-      <input type="datetime-local" id="at" name="at" value="{{ form_value }}" max="{{ max_value }}">
+      <label class="field__label" for="date">日付</label>
+      <input type="date" id="date" name="date" value="{{ date_value }}" max="{{ max_date }}" required>
+    </div>
+    <div class="field field--inline">
+      <label class="field__label" for="time">時刻</label>
+      <input type="time" id="time" name="time" value="{{ time_value }}" required>
     </div>
     <button type="submit" class="btn btn--primary btn--small">この日時から再生</button>
   </form>
+
   <div class="search__shortcuts">
+    <span class="search__shortcuts-label">よく使う範囲</span>
     {% for shortcut in shortcuts %}
-      <a class="btn btn--small" href="?at={{ shortcut.value }}">{{ shortcut.label }}</a>
+      <a class="btn btn--small" href="?date={{ shortcut.date }}&amp;time={{ shortcut.time }}">{{ shortcut.label }}</a>
     {% endfor %}
   </div>
+
+  <p class="search__current">再生中: {{ start_at|date:"Y年n月j日(D) H:i" }} から</p>
+
   {% if error %}
     <div class="errors"><p>{{ error }}</p></div>
   {% endif %}
