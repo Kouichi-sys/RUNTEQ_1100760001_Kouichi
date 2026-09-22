@@ -84,6 +84,7 @@
     </p>
 
     <div class="detail__actions">
+      <a class="btn btn--small" href="{% url 'clips:edit' clip.pk %}">タイトル・メモを編集</a>
       <a class="btn btn--small" href="{% url 'cameras:camera_live' clip.camera.pk %}">このカメラを見る</a>
       <a class="btn btn--small" href="{% url 'clips:mypage' %}">マイページに戻る</a>
     </div>

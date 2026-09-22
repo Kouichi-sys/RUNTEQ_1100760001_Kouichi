@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.views import View
-from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from cameras.models import Camera
 from cameras.video_sources import get_video_source
@@ -304,3 +304,30 @@ class ClipDownloadView(LoginRequiredMixin, View):
             as_attachment=True,
             filename=clip.download_name,
         )
+
+
+class ClipUpdateView(LoginRequiredMixin, UpdateView):
+    """保存したもののタイトル・メモを直す。
+
+    映像そのものは差し替えない。トラブル対応中に走り書きしたメモを、
+    落ち着いてから報告書向けに書き直す使い方を想定している。
+    保存した本人だけが開ける。
+    """
+
+    model = Clip
+    form_class = ClipForm
+    template_name = "clips/clip_edit.html"
+
+    def get_queryset(self):
+        # 他人のものは編集画面ごと開けない
+        return Clip.objects.filter(user=self.request.user).select_related(
+            "camera", "camera__server"
+        )
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f"「{self.object.title}」を更新しました。")
+        return response
+
+    def get_success_url(self):
+        return reverse("clips:detail", args=[self.object.pk])
