@@ -65,24 +65,6 @@
       </a>
     </div>
 
-    <div class="range">
-      <span class="range__label">クリップの範囲</span>
-      <button type="button" class="btn btn--small" data-mark="start">開始をセット</button>
-      <button type="button" class="btn btn--small" data-mark="end" disabled>終了をセット</button>
-      <span class="range__status range__status--empty" id="range-status">始まりの場面で「開始をセット」</span>
-      <a class="btn btn--primary btn--small btn--disabled" id="clip"
-         data-url="{% url 'clips:clip' camera.pk %}">クリップを保存</a>
-      <button type="button" class="btn btn--small" data-mark="clear">クリア</button>
-    </div>
-    <p class="range__note" id="range-note"></p>
-
-    <div class="range">
-      <span class="range__label">よく使う範囲</span>
-      <button type="button" class="btn btn--small" data-around="30">この前後30秒</button>
-      <button type="button" class="btn btn--small" data-around="60">この前後1分</button>
-      <button type="button" class="btn btn--small" data-around="180">この前後3分</button>
-    </div>
-
     <div class="viewer__rates">
       <span class="viewer__rates-label">再生速度</span>
       <button type="button" class="btn btn--small" data-rate="0.5">0.5倍</button>
@@ -90,6 +72,31 @@
       <button type="button" class="btn btn--small" data-rate="2">2倍</button>
       <button type="button" class="btn btn--small" data-rate="4">4倍</button>
     </div>
+
+    <section class="clip-panel">
+      <h2 class="clip-panel__title">クリップの切り取り</h2>
+      <p class="clip-panel__status clip-panel__status--empty" id="range-status">始まりの場面で「開始をセット」</p>
+
+      <div class="clip-panel__row">
+        <button type="button" class="btn btn--small" data-mark="start">開始をセット</button>
+        <button type="button" class="btn btn--small" data-mark="end" disabled>終了をセット</button>
+        <button type="button" class="btn btn--small" data-mark="clear">クリア</button>
+      </div>
+
+      <div class="clip-panel__row">
+        <span class="clip-panel__label">よく使う範囲</span>
+        <button type="button" class="btn btn--small" data-around="30">この前後30秒</button>
+        <button type="button" class="btn btn--small" data-around="60">この前後1分</button>
+        <button type="button" class="btn btn--small" data-around="180">この前後3分</button>
+      </div>
+
+      <div class="clip-panel__row">
+        <a class="btn btn--primary btn--small btn--disabled" id="clip"
+           data-url="{% url 'clips:clip' camera.pk %}">クリップを保存</a>
+      </div>
+
+      <p class="range__note" id="range-note"></p>
+    </section>
 
     <p class="viewer__note">
       トラブルの始まりで「開始をセット」、終わりで「終了をセット」を押すと、その範囲をクリップとして保存できます。<br>

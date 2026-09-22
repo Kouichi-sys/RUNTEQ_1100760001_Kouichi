@@ -74,6 +74,7 @@
     document.querySelectorAll("[data-rate]").forEach(function (button) {
       button.classList.toggle("btn--active", Number(button.dataset.rate) === rate);
     });
+    updateRange();
   }
 
   function pause() {
@@ -129,7 +130,9 @@
   const clip = document.getElementById("clip");
   const rangeStatus = document.getElementById("range-status");
   const rangeNote = document.getElementById("range-note");
+  const startButton = document.querySelector('[data-mark="start"]');
   const endButton = document.querySelector('[data-mark="end"]');
+  const rangeButtons = document.querySelectorAll("[data-mark], [data-around]");
   let clipStart = null;
   let clipEnd = null;
 
@@ -142,6 +145,24 @@
     if (!clip) {
       return;
     }
+
+    // 早送り・スロー再生のまま範囲を決めると、狙った場面とずれやすい。
+    // 等速に戻すまでクリップの操作はできないようにする
+    const equalSpeed = rate === 1;
+    rangeButtons.forEach(function (button) {
+      button.disabled = !equalSpeed;
+    });
+    if (!equalSpeed) {
+      rangeNote.textContent = "範囲を決めるには再生速度を1倍に戻してください。";
+      clip.classList.add("btn--disabled");
+      clip.removeAttribute("href");
+      return;
+    }
+
+    // 開始は決め直せないようにする。やり直すときはクリアを押す
+    if (startButton) {
+      startButton.disabled = Boolean(clipStart);
+    }
     // 終了は開始を決めてからでないと押せない
     if (endButton) {
       endButton.disabled = !clipStart;
@@ -151,7 +172,7 @@
       const seconds = Math.round((clipEnd - clipStart) / 1000);
       rangeStatus.textContent =
         clockOnly(clipStart) + " 〜 " + clockOnly(clipEnd) + " (" + seconds + "秒)";
-      rangeStatus.classList.remove("range__status--empty");
+      rangeStatus.classList.remove("clip-panel__status--empty");
       clip.classList.remove("btn--disabled");
       clip.setAttribute(
         "href",
@@ -168,7 +189,7 @@
     } else {
       rangeStatus.textContent = "始まりの場面で「開始をセット」";
     }
-    rangeStatus.classList.add("range__status--empty");
+    rangeStatus.classList.add("clip-panel__status--empty");
     clip.classList.add("btn--disabled");
     clip.removeAttribute("href");
   }
