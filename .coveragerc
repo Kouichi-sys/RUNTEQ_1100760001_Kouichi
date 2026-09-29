@@ -1,0 +1,25 @@
+# カバレッジ測定の設定
+[run]
+source = .
+branch = True
+omit =
+    # 自動生成・設定・テスト自身は測らない
+    */migrations/*
+    */tests/*
+    */factories.py
+    */apps.py
+    manage.py
+    config/asgi.py
+    config/wsgi.py
+    config/settings.py
+
+[report]
+show_missing = True
+# 下回ったらCIを落とす。テストを消して通す事態を防ぐための下限
+fail_under = 90
+skip_empty = True
+# 到達しないことが分かっている行は数えない
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == .__main__.:
