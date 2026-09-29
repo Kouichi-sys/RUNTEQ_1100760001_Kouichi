@@ -18,3 +18,7 @@ db.sqlite3
 .vscode/
 .idea/
 .DS_Store
+
+# カバレッジの出力
+htmlcov/
+.coverage
