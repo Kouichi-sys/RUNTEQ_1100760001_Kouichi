@@ -1,6 +1,7 @@
 """Django設定。値は環境変数(.env)から読み込む。"""
 
 import os
+import sys
 from pathlib import Path
 
 import dj_database_url
@@ -136,6 +137,14 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
     },
 }
+
+# テストでは collectstatic を前提にしない。
+# 既定のstorageは集約済みの一覧(manifest)に無いファイルを解決できず、
+# 静的ファイルを足すたびにテストが落ちてしまうため。
+if "test" in sys.argv:
+    STORAGES["staticfiles"]["BACKEND"] = (
+        "django.contrib.staticfiles.storage.StaticFilesStorage"
+    )
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
