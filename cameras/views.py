@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -8,6 +6,7 @@ from django.utils.dateparse import parse_datetime
 from django.views import View
 from django.views.generic import DetailView
 
+from . import services
 from .mock_frame import render_frame
 from .models import Camera, Server
 from .video_sources import MockVideoSource, get_video_source
@@ -64,66 +63,21 @@ class PlaybackView(CameraViewerMixin, LoginRequiredMixin, DetailView):
     """
 
     template_name = "cameras/playback.html"
-    # 日時を指定しなかったときに、どれだけ遡るか
-    DEFAULT_MINUTES_AGO = 60
-    DATE_FORMAT = "%Y-%m-%d"
-    TIME_FORMAT = "%H:%M"
-    SHORTCUTS = [
-        (10, "10分前"),
-        (60, "1時間前"),
-        (180, "3時間前"),
-        (1440, "昨日の今ごろ"),
-    ]
-
-    def parse_start_at(self, now):
-        """カレンダーで選ばれた日付と時刻を読む。
-
-        未来や読み取れない値は既定値に戻し、理由を画面に出す。
-        """
-        raw_date = self.request.GET.get("date", "").strip()
-        raw_time = self.request.GET.get("time", "").strip()
-        default = now - timedelta(minutes=self.DEFAULT_MINUTES_AGO)
-
-        if not raw_date and not raw_time:
-            return default, None
-
-        # 片方だけ選ばれたときは、もう片方を既定値で補う
-        raw_date = raw_date or default.strftime(self.DATE_FORMAT)
-        raw_time = raw_time or default.strftime(self.TIME_FORMAT)
-
-        try:
-            parsed = timezone.make_aware(
-                datetime.strptime(
-                    f"{raw_date} {raw_time}",
-                    f"{self.DATE_FORMAT} {self.TIME_FORMAT}",
-                )
-            )
-        except ValueError:
-            return default, "日時を読み取れませんでした。既定の1時間前から再生します。"
-
-        if parsed > now:
-            return now, "未来の日時は指定できません。現在の映像を表示します。"
-        return parsed, None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         now = timezone.localtime()
-        start_at, error = self.parse_start_at(now)
+        start_at, error = services.resolve_playback_start(
+            self.request.GET.get("date"), self.request.GET.get("time"), now
+        )
 
         context.update(self.viewer_context(start_at))
         context["error"] = error
-        context["date_value"] = start_at.strftime(self.DATE_FORMAT)
-        context["time_value"] = start_at.strftime(self.TIME_FORMAT)
-        context["max_date"] = now.strftime(self.DATE_FORMAT)
         context["start_at"] = start_at
-        context["shortcuts"] = [
-            {
-                "label": label,
-                "date": (now - timedelta(minutes=minutes)).strftime(self.DATE_FORMAT),
-                "time": (now - timedelta(minutes=minutes)).strftime(self.TIME_FORMAT),
-            }
-            for minutes, label in self.SHORTCUTS
-        ]
+        context["date_value"] = start_at.strftime(services.DATE_FORMAT)
+        context["time_value"] = start_at.strftime(services.TIME_FORMAT)
+        context["max_date"] = now.strftime(services.DATE_FORMAT)
+        context["shortcuts"] = services.playback_shortcuts(now)
         return context
 
 
