@@ -15,6 +15,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 
+# テスト実行中かどうか。開発向けの仕組みをテストから外すために使う
+RUNNING_TESTS = "test" in sys.argv
+
+
 def env_bool(key, default=False):
     """環境変数を真偽値として読む。"""
     return os.environ.get(key, str(default)).lower() in ("true", "1", "yes")
@@ -141,7 +145,7 @@ STORAGES = {
 # テストでは collectstatic を前提にしない。
 # 既定のstorageは集約済みの一覧(manifest)に無いファイルを解決できず、
 # 静的ファイルを足すたびにテストが落ちてしまうため。
-if "test" in sys.argv:
+if RUNNING_TESTS:
     STORAGES["staticfiles"]["BACKEND"] = (
         "django.contrib.staticfiles.storage.StaticFilesStorage"
     )
@@ -154,6 +158,23 @@ VIDEO_SOURCE = os.environ.get("VIDEO_SOURCE", "mock")
 NX_BASE_URL = os.environ.get("NX_BASE_URL", "")
 NX_USERNAME = os.environ.get("NX_USERNAME", "")
 NX_PASSWORD = os.environ.get("NX_PASSWORD", "")
+
+
+# 開発時だけdjango-debug-toolbarを有効にする。
+# 問い合わせ回数を画面上で確認し、N+1に気付けるようにするため。
+# 本番(Render)にはこの依存を入れていないので、読み込めなければ何もしない。
+# テスト実行時はDjangoがDEBUGをFalseにするため、ツールバーを入れると整合が取れない
+if DEBUG and not RUNNING_TESTS:
+    try:
+        import debug_toolbar  # noqa: F401
+    except ImportError:
+        pass
+    else:
+        INSTALLED_APPS.append("debug_toolbar")
+        MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+        # Dockerのコンテナ内から見るとINTERNAL_IPSの判定が難しいため、
+        # 開発時は常に表示する
+        DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
 
 
 if not DEBUG:

@@ -5,6 +5,7 @@ from urllib.parse import quote, urlencode
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import ContentFile
+from django.db.models import Count, Q
 from django.http import FileResponse, Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -207,11 +208,16 @@ class MyPageView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        mine = Clip.objects.filter(user=self.request.user)
+        # 種別ごとに数えると問い合わせが3回になるため、1回で数える
+        counts = Clip.objects.filter(user=self.request.user).aggregate(
+            total=Count("pk"),
+            image=Count("pk", filter=Q(media_type=Clip.IMAGE)),
+            video=Count("pk", filter=Q(media_type=Clip.VIDEO)),
+        )
         context["selected_type"] = self.request.GET.get("type", "")
-        context["total_count"] = mine.count()
-        context["image_count"] = mine.filter(media_type=Clip.IMAGE).count()
-        context["video_count"] = mine.filter(media_type=Clip.VIDEO).count()
+        context["total_count"] = counts["total"]
+        context["image_count"] = counts["image"]
+        context["video_count"] = counts["video"]
         return context
 
 

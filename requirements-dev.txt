@@ -3,3 +3,4 @@
 
 factory_boy==3.3.3
 coverage==7.10.7
+django-debug-toolbar==6.0.0
