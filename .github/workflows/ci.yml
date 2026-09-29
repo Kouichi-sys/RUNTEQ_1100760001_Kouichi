@@ -53,4 +53,8 @@ jobs:
         run: python manage.py makemigrations --check --dry-run
 
       - name: テストを実行する
-        run: python manage.py test --verbosity 2
+        run: coverage run manage.py test --verbosity 2
+
+      - name: カバレッジを確認する
+        # .coveragerc の下限(90%)を下回ると失敗する
+        run: coverage report
