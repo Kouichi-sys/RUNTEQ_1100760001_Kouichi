@@ -1,0 +1,56 @@
+name: CI
+
+# mainへのpushと、mainへ向けたPRで実行する
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: テスト
+    runs-on: ubuntu-latest
+
+    services:
+      # 本番と同じPostgreSQL 16で動かす
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_DB: genba_camera
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # 本番と同じくDEBUG=Falseで動かす。値はCI専用のもの
+      SECRET_KEY: ci-secret-key-not-used-in-production
+      DEBUG: "False"
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/genba_camera
+      VIDEO_SOURCE: mock
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pythonを用意する
+        uses: actions/setup-python@v5
+        with:
+          # Render(PYTHON_VERSION)とDockerfileに合わせる
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: 依存をインストールする
+        run: pip install -r requirements-dev.txt
+
+      - name: マイグレーションの作り忘れが無いか確かめる
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: テストを実行する
+        run: python manage.py test --verbosity 2

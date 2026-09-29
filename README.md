@@ -373,6 +373,9 @@ docker compose exec web python manage.py test
 テストデータの生成には factory_boy を使っています(`各アプリ/factories.py`)。
 テスト用の依存は `requirements-dev.txt` にまとめており、本番イメージには入りません。
 
+mainへのPRを作成すると、GitHub Actions で同じテストが自動実行されます
+(`.github/workflows/ci.yml`)。
+
 ### 画面構成
 
 | URL | 画面 | ログイン |
