@@ -1,0 +1,4 @@
+# 開発・テストでのみ使う依存。本番イメージには入れない。
+-r requirements.txt
+
+factory_boy==3.3.3

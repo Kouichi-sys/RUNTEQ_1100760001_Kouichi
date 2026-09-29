@@ -364,6 +364,15 @@ docker compose exec web python manage.py create_demo_cameras
 
 起動後、`http://localhost:8000/` にアクセスするとログイン画面が表示されます。
 
+### テストの実行
+
+```bash
+docker compose exec web python manage.py test
+```
+
+テストデータの生成には factory_boy を使っています(`各アプリ/factories.py`)。
+テスト用の依存は `requirements-dev.txt` にまとめており、本番イメージには入りません。
+
 ### 画面構成
 
 | URL | 画面 | ログイン |

@@ -7,8 +7,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 # 依存だけ先に入れることで、アプリのコード変更時にキャッシュを効かせる
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt requirements-dev.txt /app/
+# 開発用コンテナではテスト用の依存も入れる。本番(Render)は requirements.txt だけを使う
+ARG INSTALL_DEV=false
+RUN if [ "$INSTALL_DEV" = "true" ]; then \
+        pip install --no-cache-dir -r requirements-dev.txt; \
+    else \
+        pip install --no-cache-dir -r requirements.txt; \
+    fi
 
 COPY . /app/
 
